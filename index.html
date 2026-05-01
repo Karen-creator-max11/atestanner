@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Կրթական Հարթակ - Մուտք</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .login-container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 350px; text-align: center; }
+        h2 { color: #333; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #5a6fd6; }
+        .error { color: #e74c3c; font-size: 14px; display: none; margin-top: 10px; }
+        .hint { font-size: 11px; color: #888; margin-top: 15px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Մուտք Համակարգ</h2>
+    <input type="text" id="username" placeholder="Օգտանուն">
+    <input type="password" id="password" placeholder="Գաղտնաբառ">
+    <button onclick="handleLogin()">Մուտք գործել</button>
+    <div id="error-msg" class="error">Սխալ օգտանուն կամ գաղտնաբառ</div>
+    
+    <div class="hint">
+        * Ուսուցիչների համար՝ հատուկ ID<br>
+        * Աշակերտների համար՝ Անուն կամ Անուն_ԱզգանվանԱռաջինՏառ
+    </div>
+</div>
+
+<script>
+    // Ուսուցչի տվյալները
+    const TEACHER_USER = "teacher2024";
+    const TEACHER_PASS = "dproc123";
+
+    // Աշակերտների ցուցակը
+    const students = [
+        "Աբգարյան Տաթևիկ", "Աղեկյան Մանվել", "Արամյան Արսեն", "Արզումանյան Անժելա", "Բաբայան Արյուսակ",
+        "Բաղդասարյան Արյուսակ", "Բունիաթյան Գոհար", "Գասպարյան Արսեն", "Գյուլումյան Հասմիկ", "Գրիգորյան Աննա",
+        "Զաքարյան Աշխեն", "Խալաթյան Աշխեն", "Կարապետյան Ալիսա", "Հովհաննիսյան Մելինե", "Մեսրոպյան Սոնա",
+        "Մուրադյան Արսեն", "Ներսիսյան Մարինա", "Նիկողոսյան Մարգարիտ", "Շահբազյան Լիլիա", "Սուքիսյան Նարինե",
+        "Աբելյան Զարուհի", "Աբրահամյան Լիլիա", "Գյուլումյան Վահե", "Դավթյան Կարեն", "Դիլանյան Աննա",
+        "Զալյան Արման", "Թադևոսյան Սյուզան", "Իգիթյան Սոնա", "Լևոնյան Արթեմ", "Կարապետյան Լիլիթ",
+        "Կիրակոսյան Ռոզա", "Կիրակոսյան Ալիսա", "Հակոբջանյան Անի", "Մամիկոնյան Ռուբեն", "Նահապետյան Գայանե",
+        "Սահակյան Կարեն", "Վանյան Արյուսակ", "Փայտյան Հրայր", "Քյարունյան Կարեն", "Օհաննիսյան Հակոբ"
+    ];
+
+    function handleLogin() {
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        const error = document.getElementById('error-msg');
+
+        // 1. Ստուգում ենք՝ արդյոք ուսուցիչն է
+        if (user === TEACHER_USER && pass === TEACHER_PASS) {
+            window.location.href = "marks.html";
+            return;
+        }
+
+        // 2. Ստուգում ենք աշակերտների բազան
+        let nameCounts = {};
+        students.forEach(s => {
+            let firstName = s.split(' ')[1]; // Վերցնում ենք Անունը
+            nameCounts[firstName] = (nameCounts[firstName] || 0) + 1;
+        });
+
+        let studentFound = false;
+        students.forEach(s => {
+            const parts = s.split(' ');
+            const lastName = parts[0];
+            const firstName = parts[1];
+            
+            let finalUsername = firstName;
+            if (nameCounts[firstName] > 1) {
+                finalUsername = firstName + "_" + lastName[0]; // Օրինակ՝ Արսեն_Ա
+            }
+
+            if (user === finalUsername && pass === "12345") {
+                studentFound = true;
+                // Պահում ենք աշակերտի անունը, որ հաջորդ էջում ցույց տանք իր գնահատականները
+                localStorage.setItem('studentName', s);
+                window.location.href = "student_view.html";
+            }
+        });
+
+        if (!studentFound) {
+            error.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>

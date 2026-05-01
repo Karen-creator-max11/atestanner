@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ԱՏԵՍՏԱՏ - Աշակերտի Անձնական Էջ</title>
+    <style>
+        :root {
+            --danger: #e74c3c;   /* 1-4 */
+            --warning: #f39c12;  /* 5-6 */
+            --info: #3498db;     /* 7-8 */
+            --success: #2ecc71;  /* 9-10 */
+            --none: #f1f1f1;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        
+        .header-title { font-size: 36px; font-weight: bold; color: #2c3e50; letter-spacing: 5px; border-bottom: 4px solid #2c3e50; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
+        
+        .student-info { 
+            margin-bottom: 25px; padding: 15px 25px; background: #eef2f3; border-radius: 12px; 
+            font-size: 18px; color: #34495e; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+        }
+        .class-badge { background: #34495e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 15px 10px; border-bottom: 1px solid #eee; text-align: center; }
+        th { background-color: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; }
+        
+        .subject-name { text-align: left; font-weight: bold; color: #2c3e50; padding-left: 20px; min-width: 180px; }
+
+        /* Գնահատականի քառակուսու ոճը */
+        .mark-box {
+            width: 40px; height: 40px; margin: auto; display: flex; 
+            justify-content: center; align-items: center; border-radius: 8px; 
+            font-weight: bold; font-size: 16px; color: white; transition: 0.3s;
+        }
+
+        .m-danger { background-color: var(--danger); }
+        .m-warning { background-color: var(--warning); }
+        .m-info { background-color: var(--info); }
+        .m-success { background-color: var(--success); }
+        .m-none { background-color: var(--none); color: #999; }
+
+        .annual-col { background-color: #fcfcfc; border-left: 2px solid #eee; }
+
+        .logout-btn { 
+            display: inline-block; margin-top: 30px; color: #e74c3c; text-decoration: none; 
+            font-weight: bold; border: 2px solid #e74c3c; padding: 10px 25px; border-radius: 10px; transition: 0.3s;
+        }
+        .logout-btn:hover { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-title">ԱՏԵՍՏԱՏ</div>
+    
+    <div class="student-info">
+        <span id="stName">Աշակերտ՝ -</span>
+        <span class="class-badge" id="stClass">Դասարան՝ -</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th class="subject-name">Առարկա</th>
+                    <th>1-ին Կիսամյակ</th>
+                    <th>2-րդ Կիսամյակ</th>
+                    <th class="annual-col">Տարեկան</th>
+                </tr>
+            </thead>
+            <tbody id="marksBody">
+                <!-- Տվյալները կլցվեն JavaScript-ով -->
+            </tbody>
+        </table>
+    </div>
+
+    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
+</div>
+
+<script>
+    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
+    const students11a = ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'];
+
+    const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
+    document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
+    document.getElementById('stClass').innerText = "Դասարան՝ " + (students11a.includes(currentStudent) ? "11ա" : "12ա");
+
+    const tbody = document.getElementById('marksBody');
+
+    function getMarkHTML(mark) {
+        if (!mark || mark === "-") return `<div class="mark-box m-none">-</div>`;
+        const n = parseInt(mark);
+        let cls = "m-none";
+        if (n >= 1 && n <= 4) cls = "m-danger";
+        else if (n >= 5 && n <= 6) cls = "m-warning";
+        else if (n >= 7 && n <= 8) cls = "m-info";
+        else if (n >= 9 && n <= 10) cls = "m-success";
+        return `<div class="mark-box ${cls}">${n}</div>`;
+    }
+
+    subjects.forEach(sub => {
+        const m1 = localStorage.getItem(`${currentStudent}_${sub}_Sem1`) || "-";
+        const m2 = localStorage.getItem(`${currentStudent}_${sub}_Sem2`) || "-";
+        const annual = localStorage.getItem(`${currentStudent}_${sub}_Annual`) || "-";
+
+        tbody.innerHTML += `
+            <tr>
+                <td class="subject-name">${sub}</td>
+                <td>${getMarkHTML(m1)}</td>
+                <td>${getMarkHTML(m2)}</td>
+                <td class="annual-col">${getMarkHTML(annual)}</td>
+            </tr>
+        `;
+    });
+</script>
+
+</body>
+</html>
