@@ -31,6 +31,7 @@
         
         .subject-name { text-align: left; font-weight: bold; color: #2c3e50; padding-left: 20px; min-width: 180px; }
 
+        /* Գնահատականի քառակուսու ոճը */
         .mark-box {
             width: 40px; height: 40px; margin: auto; display: flex; 
             justify-content: center; align-items: center; border-radius: 8px; 
@@ -72,27 +73,27 @@
                     <th class="annual-col">Տարեկան</th>
                 </tr>
             </thead>
-            <tbody id="marksBody"></tbody>
+            <tbody id="marksBody">
+                <!-- Տվյալները կլցվեն JavaScript-ով -->
+            </tbody>
         </table>
     </div>
 
-    <a href="login.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
+    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
 </div>
 
 <script>
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
-    
-    // Վերցնում ենք մուտք եղած աշակերտի անունը
-    const currentStudent = localStorage.getItem('currentUser') || "Աշակերտ";
-    const userClass = localStorage.getItem('userClass') || "11ա";
+    const students11a = ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'];
 
+    const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
     document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
-    document.getElementById('stClass').innerText = "Դասարան՝ " + userClass;
+    document.getElementById('stClass').innerText = "Դասարան՝ " + (students11a.includes(currentStudent) ? "11ա" : "12ա");
 
     const tbody = document.getElementById('marksBody');
 
     function getMarkHTML(mark) {
-        if (!mark || mark === "" || mark === "-") return `<div class="mark-box m-none">-</div>`;
+        if (!mark || mark === "-") return `<div class="mark-box m-none">-</div>`;
         const n = parseInt(mark);
         let cls = "m-none";
         if (n >= 1 && n <= 4) cls = "m-danger";
@@ -103,15 +104,9 @@
     }
 
     subjects.forEach(sub => {
-        // Վերցնում ենք գնահատականները մատյանի պահած տվյալներից
-        const m1 = localStorage.getItem(`${currentStudent}_${sub}_Sem1`) || "";
-        const m2 = localStorage.getItem(`${currentStudent}_${sub}_Sem2`) || "";
-        
-        // Հաշվարկում ենք տարեկանը ավտոմատ
-        let annual = "-";
-        if (m1 !== "" && m2 !== "") {
-            annual = Math.round((parseFloat(m1) + parseFloat(m2)) / 2);
-        }
+        const m1 = localStorage.getItem(`${currentStudent}_${sub}_Sem1`) || "-";
+        const m2 = localStorage.getItem(`${currentStudent}_${sub}_Sem2`) || "-";
+        const annual = localStorage.getItem(`${currentStudent}_${sub}_Annual`) || "-";
 
         tbody.innerHTML += `
             <tr>

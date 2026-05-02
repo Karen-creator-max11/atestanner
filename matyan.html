@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ուսուցչի Մատյան - Տեղային Պահպանում</title>
+    <title>Ուսուցչի Մատյան - Վերջնական Կապ</title>
     <style>
         :root { --primary: #4a90e2; --bg: #f0f4f8; --text: #2c3e50; --success: #2ecc71; --border: #dee2e6; --annual-color: #9b59b6; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--text); }
@@ -21,12 +21,15 @@
         .btn-annual { border-color: var(--annual-color); color: var(--annual-color); }
         .btn-annual.active { background: var(--annual-color); color: white; }
         #semester-section { display: none; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; background: white; }
         th { background: #f8f9fa; font-size: 11px; padding: 15px 5px; border-bottom: 2px solid var(--border); text-transform: uppercase; color: #7f8c8d; }
         td { padding: 10px 5px; border-bottom: 1px solid #f1f1f1; text-align: center; }
         .student-name { text-align: left; padding-left: 20px; font-weight: 600; min-width: 200px; }
         input[type="number"] { width: 45px; height: 35px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-weight: bold; outline: none; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         .annual-val { font-weight: bold; color: var(--annual-color); font-size: 18px; }
     </style>
 </head>
@@ -37,7 +40,7 @@
         <h2>Ամփոփիչ Մատյան</h2>
         <div class="action-buttons">
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
-            <a href="login.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
+            <a href="index.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
         </div>
     </div>
 
@@ -97,6 +100,7 @@
     function renderTable() {
         document.getElementById('marks-table-container').style.display = 'block';
         document.getElementById('table-title').innerText = `${currentClass} դասարան - ` + (currentView === 'annual' ? "ՏԱՐԵԿԱՆ ԱՄՓՈՓՈՒՄ" : `${currentView}-րդ Կիսամյակ`);
+        
         document.getElementById('save-btn-ui').style.display = (currentView === 'annual') ? 'none' : 'block';
 
         const list = document.getElementById('students-list');
@@ -106,23 +110,43 @@
             let cells = '';
             subjects.forEach((sub, cIdx) => {
                 if (currentView === 'annual') {
+                    // Հաշվարկ և ԿԱՊՈՒՄ
                     const m1 = parseFloat(localStorage.getItem(`${student}_${sub}_Sem1`)) || 0;
                     const m2 = parseFloat(localStorage.getItem(`${student}_${sub}_Sem2`)) || 0;
                     let annual = (m1 > 0 && m2 > 0) ? Math.round((m1 + m2) / 2) : "-";
+                    
+                    // ՍԱ Է ԱՅՆ ԿԱՊԸ. Պահում ենք, որպեսզի աշակերտը տեսնի
+                    if (annual !== "-") {
+                        localStorage.setItem(`${student}_${sub}_Annual`, annual);
+                    } else {
+                        localStorage.removeItem(`${student}_${sub}_Annual`);
+                    }
+                    
                     cells += `<td><span class="annual-val">${annual}</span></td>`;
                 } else {
                     const val = localStorage.getItem(`${student}_${sub}_Sem${currentView}`) || "";
                     cells += `<td><input type="number" class="mark-input" data-student="${student}" data-subject="${sub}" 
-                               value="${val}" min="1" max="10" oninput="validateMark(this)"></td>`;
+                               data-row="${rIdx}" data-col="${cIdx}" value="${val}" min="1" max="10" 
+                               oninput="validateMark(this)" onkeydown="navigate(event, this)"></td>`;
                 }
             });
             list.innerHTML += `<tr><td>${rIdx+1}</td><td class="student-name">${student}</td>${cells}</tr>`;
         });
     }
 
+    function navigate(e, input) {
+        let r = parseInt(input.dataset.row), c = parseInt(input.dataset.col), target;
+        if(e.key === "ArrowDown") target = document.querySelector(`input[data-row="${r+1}"][data-col="${c}"]`);
+        if(e.key === "ArrowUp") target = document.querySelector(`input[data-row="${r-1}"][data-col="${c}"]`);
+        if(e.key === "ArrowRight") target = document.querySelector(`input[data-row="${r}"][data-col="${c+1}"]`);
+        if(e.key === "ArrowLeft") target = document.querySelector(`input[data-row="${r}"][data-col="${c-1}"]`);
+        if(target) { e.preventDefault(); target.focus(); }
+    }
+
     function validateMark(input) {
-        if(input.value !== "" && (input.value < 1 || input.value > 10)) {
-            alert("1-10 սահմանում");
+        let v = input.value;
+        if(v !== "" && (parseInt(v) < 1 || parseInt(v) > 10 || v.includes('.') || v.includes(','))) {
+            alert("Մուտքագրեք 1-10 բնական թիվ");
             input.value = "";
         }
     }
@@ -131,7 +155,7 @@
         document.querySelectorAll('.mark-input').forEach(input => {
             localStorage.setItem(`${input.dataset.student}_${input.dataset.subject}_Sem${currentView}`, input.value);
         });
-        alert("Պահպանվեց այս համակարգչի մեջ:");
+        alert(`Տվյալները պահպանվեցին:`);
     }
 </script>
 </body>
