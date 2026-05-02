@@ -25,62 +25,54 @@
     <div id="error-msg" class="error">Սխալ օգտանուն կամ գաղտնաբառ</div>
     
     <div class="hint">
-        * Ուսուցիչների համար՝ հատուկ ID<br>
-        * Աշակերտների համար՝ Անուն կամ Անուն_ԱզգանվանԱռաջինՏառ
+        * Ուսուցիչ: <b>teacher2024</b> (pass: dproc123)<br>
+        * Աշակերտ: Անուն կամ Անուն_Ա (pass: 12345)
     </div>
 </div>
 
 <script>
-    // Ուսուցչի տվյալները
     const TEACHER_USER = "teacher2024";
     const TEACHER_PASS = "dproc123";
 
-    // Աշակերտների ցուցակը
-    const students = [
-        "Աբգարյան Տաթևիկ", "Աղեկյան Մանվել", "Արամյան Արսեն", "Արզումանյան Անժելա", "Բաբայան Արյուսակ",
-        "Բաղդասարյան Արյուսակ", "Բունիաթյան Գոհար", "Գասպարյան Արսեն", "Գյուլումյան Հասմիկ", "Գրիգորյան Աննա",
-        "Զաքարյան Աշխեն", "Խալաթյան Աշխեն", "Կարապետյան Ալիսա", "Հովհաննիսյան Մելինե", "Մեսրոպյան Սոնա",
-        "Մուրադյան Արսեն", "Ներսիսյան Մարինա", "Նիկողոսյան Մարգարիտ", "Շահբազյան Լիլիա", "Սուքիսյան Նարինե",
-        "Աբելյան Զարուհի", "Աբրահամյան Լիլիա", "Գյուլումյան Վահե", "Դավթյան Կարեն", "Դիլանյան Աննա",
-        "Զալյան Արման", "Թադևոսյան Սյուզան", "Իգիթյան Սոնա", "Լևոնյան Արթեմ", "Կարապետյան Լիլիթ",
-        "Կիրակոսյան Ռոզա", "Կիրակոսյան Ալիսա", "Հակոբջանյան Անի", "Մամիկոնյան Ռուբեն", "Նահապետյան Գայանե",
-        "Սահակյան Կարեն", "Վանյան Արյուսակ", "Փայտյան Հրայր", "Քյարունյան Կարեն", "Օհաննիսյան Հակոբ"
-    ];
+    const students11a = ["Աբգարյան Տաթևիկ", "Աղեկյան Մանվել", "Արամյան Արսեն", "Արզումանյան Անժելա", "Բաբայան Արյուսակ", "Բաղդասարյան Արյուսակ", "Բունիաթյան Գոհար", "Գասպարյան Արսեն", "Գյուլումյան Հասմիկ", "Գրիգորյան Աննա", "Զաքարյան Աշխեն", "Խալաթյան Աշխեն", "Կարապետյան Ալիսա", "Հովհաննիսյան Մելինե", "Մեսրոպյան Սոնա", "Մուրադյան Արսեն", "Ներսիսյան Մարինա", "Նիկողոսյան Մարգարիտ", "Շահբազյան Լիլիա", "Սուքիսյան Նարինե"];
+    const students12a = ["Աբելյան Զարուհի", "Աբրահամյան Լիլիա", "Գյուլումյան Վահե", "Դավթյան Կարեն", "Դիլանյան Աննա", "Զալյան Արման", "Թադևոսյան Սյուզան", "Իգիթյան Սոնա", "Լևոնյան Արթեմ", "Կարապետյան Լիլիթ", "Կիրակոսյան Ռոզա", "Կիրակոսյան Ալիսա", "Հակոբջանյան Անի", "Մամիկոնյան Ռուբեն", "Նահապետյան Գայանե", "Սահակյան Կարեն", "Վանյան Արյուսակ", "Փայտյան Հրայր", "Քյարունյան Կարեն", "Օհաննիսյան Հակոբ"];
+
+    const allStudents = [...students11a, ...students12a];
 
     function handleLogin() {
         const user = document.getElementById('username').value.trim();
         const pass = document.getElementById('password').value;
         const error = document.getElementById('error-msg');
 
-        // 1. Ստուգում ենք՝ արդյոք ուսուցիչն է
         if (user === TEACHER_USER && pass === TEACHER_PASS) {
             window.location.href = "matyan.html";
             return;
         }
 
-        // 2. Ստուգում ենք աշակերտների բազան
         let nameCounts = {};
-        students.forEach(s => {
-            let firstName = s.split(' ')[1]; // Վերցնում ենք Անունը
+        allStudents.forEach(s => {
+            let firstName = s.split(' ')[1];
             nameCounts[firstName] = (nameCounts[firstName] || 0) + 1;
         });
 
         let studentFound = false;
-        students.forEach(s => {
+        allStudents.forEach(s => {
             const parts = s.split(' ');
             const lastName = parts[0];
             const firstName = parts[1];
             
             let finalUsername = firstName;
             if (nameCounts[firstName] > 1) {
-                finalUsername = firstName + "_" + lastName[0]; // Օրինակ՝ Արսեն_Ա
+                finalUsername = firstName + "_" + lastName[0];
             }
 
             if (user === finalUsername && pass === "12345") {
                 studentFound = true;
-                // Պահում ենք աշակերտի անունը, որ հաջորդ էջում ցույց տանք իր գնահատականները
-                localStorage.setItem('studentName', s);
-                window.location.href = "student_view.html";
+                // Պահում ենք տվյալները, որ աշակերտի էջը կարողանա օգտագործել
+                localStorage.setItem('currentUser', s); 
+                localStorage.setItem('userClass', students11a.includes(s) ? "11ա" : "12ա");
+                
+                window.location.href = "student.html"; // Համոզվիր, որ ֆայլիդ անունը հենց student.html է
             }
         });
 
