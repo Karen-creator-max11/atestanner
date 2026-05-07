@@ -3,41 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ուսուցչի Մատյան - Վերջնական Կապ</title>
+    <title>Ուսուցչի Մատյան - Live Sync</title>
     <style>
         :root { --primary: #4a90e2; --bg: #f0f4f8; --text: #2c3e50; --success: #2ecc71; --border: #dee2e6; --annual-color: #9b59b6; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--text); }
         .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
         .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
         h2 { margin: 0; color: var(--primary); font-size: 26px; }
+        
         .action-buttons { display: flex; gap: 10px; }
         .btn-ui { text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; transition: 0.3s; border: 2px solid; }
         .save-btn-top { background: var(--success); color: white; border-color: var(--success); display: none; }
+        .save-btn-top:disabled { background: #bdc3c7; border-color: #bdc3c7; cursor: not-allowed; }
         .logout-btn { color: #e74c3c; border-color: #e74c3c; background: white; }
+
         .selector-box { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; }
         .btn-group { display: flex; gap: 10px; }
         .btn { padding: 12px 25px; cursor: pointer; border: 2px solid var(--primary); border-radius: 12px; background: white; color: var(--primary); font-weight: bold; transition: 0.3s; }
         .btn.active { background: var(--primary); color: white; }
         .btn-annual { border-color: var(--annual-color); color: var(--annual-color); }
         .btn-annual.active { background: var(--annual-color); color: white; }
+
         #semester-section { display: none; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; position: relative; }
         table { width: 100%; border-collapse: collapse; background: white; }
         th { background: #f8f9fa; font-size: 11px; padding: 15px 5px; border-bottom: 2px solid var(--border); text-transform: uppercase; color: #7f8c8d; }
         td { padding: 10px 5px; border-bottom: 1px solid #f1f1f1; text-align: center; }
         .student-name { text-align: left; padding-left: 20px; font-weight: 600; min-width: 200px; }
-        input[type="number"] { width: 45px; height: 35px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-weight: bold; outline: none; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+
+        input[type="number"] { width: 45px; height: 35px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-weight: bold; outline: none; transition: 0.2s; }
+        input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(74, 144, 226, 0.3); }
+        
         .annual-val { font-weight: bold; color: var(--annual-color); font-size: 18px; }
+        
+        #loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 10; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-section">
-        <h2>Ամփոփիչ Մատյան</h2>
+        <h2>Ամփոփիչ Մատյան (Live)</h2>
         <div class="action-buttons">
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
             <a href="index.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
@@ -59,6 +67,7 @@
     <div id="marks-table-container" style="display:none;">
         <h3 id="table-title" style="text-align: center; color: #7f8c8d; margin-bottom: 20px;"></h3>
         <div class="table-wrapper">
+            <div id="loading-overlay">Բեռնվում է...</div>
             <table>
                 <thead>
                     <tr>
@@ -74,8 +83,11 @@
 </div>
 
 <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-IA3Ed8JxcU4NAgEp2COOPqNtN8WdjO2aaOt1F2Qu50VWbsoEgHbHEBc2EFAofmbhfQ/exec";
+    
     let currentClass = '', currentView = ''; 
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
+    
     const studentsData = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
@@ -90,17 +102,43 @@
         document.getElementById('save-btn-ui').style.display = 'none';
     }
 
-    function selectType(type, btn) {
+    async function selectType(type, btn) {
         currentView = type;
         document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderTable();
+        
+        renderTable(); // Նախնական ցույց ենք տալիս դատարկ կամ localStorage-ով
+        await syncWithSheets(); // Թարմացնում ենք Google Sheets-ից
+    }
+
+    async function syncWithSheets() {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'flex';
+        
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+            
+            // Տվյալները սինխրոնացնում ենք localStorage-ի հետ
+            // Տվյալների կառուցվածքը ըստ քո աղյուսակի սյուների
+            data.forEach((row, index) => {
+                if (index === 0) return; // Header row
+                const login = row[1]; // Column B
+                const grade = row[2]; // Column C
+                if(login) localStorage.setItem(`grade_sync_${login}`, grade);
+            });
+            
+            renderTable();
+        } catch (e) {
+            console.log("Sync error (հավանաբար առաջին բեռնումն է):", e);
+        } finally {
+            overlay.style.display = 'none';
+        }
     }
 
     function renderTable() {
         document.getElementById('marks-table-container').style.display = 'block';
         document.getElementById('table-title').innerText = `${currentClass} դասարան - ` + (currentView === 'annual' ? "ՏԱՐԵԿԱՆ ԱՄՓՈՓՈՒՄ" : `${currentView}-րդ Կիսամյակ`);
-        
         document.getElementById('save-btn-ui').style.display = (currentView === 'annual') ? 'none' : 'block';
 
         const list = document.getElementById('students-list');
@@ -109,24 +147,19 @@
         studentsData[currentClass].forEach((student, rIdx) => {
             let cells = '';
             subjects.forEach((sub, cIdx) => {
+                const storageKey = `${student}_${sub}_Sem${currentView}`;
+                const val = localStorage.getItem(storageKey) || "";
+
                 if (currentView === 'annual') {
-                    // Հաշվարկ և ԿԱՊՈՒՄ
                     const m1 = parseFloat(localStorage.getItem(`${student}_${sub}_Sem1`)) || 0;
                     const m2 = parseFloat(localStorage.getItem(`${student}_${sub}_Sem2`)) || 0;
                     let annual = (m1 > 0 && m2 > 0) ? Math.round((m1 + m2) / 2) : "-";
-                    
-                    // ՍԱ Է ԱՅՆ ԿԱՊԸ. Պահում ենք, որպեսզի աշակերտը տեսնի
-                    if (annual !== "-") {
-                        localStorage.setItem(`${student}_${sub}_Annual`, annual);
-                    } else {
-                        localStorage.removeItem(`${student}_${sub}_Annual`);
-                    }
-                    
                     cells += `<td><span class="annual-val">${annual}</span></td>`;
                 } else {
-                    const val = localStorage.getItem(`${student}_${sub}_Sem${currentView}`) || "";
-                    cells += `<td><input type="number" class="mark-input" data-student="${student}" data-subject="${sub}" 
-                               data-row="${rIdx}" data-col="${cIdx}" value="${val}" min="1" max="10" 
+                    cells += `<td><input type="number" class="mark-input" 
+                               data-student="${student}" data-subject="${sub}" 
+                               data-row="${rIdx}" data-col="${cIdx}" 
+                               value="${val}" min="1" max="10" 
                                oninput="validateMark(this)" onkeydown="navigate(event, this)"></td>`;
                 }
             });
@@ -145,17 +178,52 @@
 
     function validateMark(input) {
         let v = input.value;
-        if(v !== "" && (parseInt(v) < 1 || parseInt(v) > 10 || v.includes('.') || v.includes(','))) {
-            alert("Մուտքագրեք 1-10 բնական թիվ");
+        if(v !== "" && (parseInt(v) < 1 || parseInt(v) > 10)) {
+            alert("Մուտքագրեք 1-10 թիվ");
             input.value = "";
         }
     }
 
-    function saveAll() {
-        document.querySelectorAll('.mark-input').forEach(input => {
-            localStorage.setItem(`${input.dataset.student}_${input.dataset.subject}_Sem${currentView}`, input.value);
+    async function saveAll() {
+        const btn = document.getElementById('save-btn-ui');
+        btn.disabled = true;
+        btn.innerText = "ՊԱՀՊԱՆՎՈՒՄ Է...";
+
+        const inputs = document.querySelectorAll('.mark-input');
+        const promises = [];
+
+        inputs.forEach(input => {
+            const student = input.dataset.student;
+            const sub = input.dataset.subject;
+            const val = input.value;
+            const key = `${student}_${sub}_Sem${currentView}`;
+            
+            localStorage.setItem(key, val);
+
+            if(val !== "") {
+                promises.push(
+                    fetch(SCRIPT_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            login: student, // Apps Script-ը փնտրելու է այս անունը B սյունակում
+                            grade: val      // Այս թիվը կգրի C սյունակում
+                        })
+                    })
+                );
+            }
         });
-        alert(`Տվյալները պահպանվեցին:`);
+
+        try {
+            await Promise.all(promises);
+            alert("Բոլոր տվյալները հաջողությամբ պահպանվեցին Google Sheets-ում:");
+        } catch (e) {
+            alert("Պահպանման ժամանակ սխալ տեղի ունեցավ:");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "ՊԱՀՊԱՆԵԼ";
+        }
     }
 </script>
 </body>

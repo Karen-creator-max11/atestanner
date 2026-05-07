@@ -14,7 +14,7 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; }
         
         .header-title { font-size: 36px; font-weight: bold; color: #2c3e50; letter-spacing: 5px; border-bottom: 4px solid #2c3e50; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
         
@@ -24,14 +24,13 @@
         }
         .class-badge { background: #34495e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
 
-        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; }
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; position: relative; }
         table { width: 100%; border-collapse: collapse; background: white; }
         th, td { padding: 15px 10px; border-bottom: 1px solid #eee; text-align: center; }
         th { background-color: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; }
         
         .subject-name { text-align: left; font-weight: bold; color: #2c3e50; padding-left: 20px; min-width: 180px; }
 
-        /* Գնահատականի քառակուսու ոճը */
         .mark-box {
             width: 40px; height: 40px; margin: auto; display: flex; 
             justify-content: center; align-items: center; border-radius: 8px; 
@@ -51,11 +50,18 @@
             font-weight: bold; border: 2px solid #e74c3c; padding: 10px 25px; border-radius: 10px; transition: 0.3s;
         }
         .logout-btn:hover { background: #e74c3c; color: white; }
+
+        #loading-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8); z-index: 10; justify-content: center; align-items: center;
+            font-weight: bold; color: #2c3e50; border-radius: 12px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div id="loading-overlay">Թարմացվում է...</div>
     <div class="header-title">ԱՏԵՍՏԱՏ</div>
     
     <div class="student-info">
@@ -74,8 +80,7 @@
                 </tr>
             </thead>
             <tbody id="marksBody">
-                <!-- Տվյալները կլցվեն JavaScript-ով -->
-            </tbody>
+                </tbody>
         </table>
     </div>
 
@@ -83,6 +88,7 @@
 </div>
 
 <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-IA3Ed8JxcU4NAgEp2COOPqNtN8WdjO2aaOt1F2Qu50VWbsoEgHbHEBc2EFAofmbhfQ/exec";
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     const students11a = ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'];
 
@@ -90,11 +96,11 @@
     document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
     document.getElementById('stClass').innerText = "Դասարան՝ " + (students11a.includes(currentStudent) ? "11ա" : "12ա");
 
-    const tbody = document.getElementById('marksBody');
-
     function getMarkHTML(mark) {
-        if (!mark || mark === "-") return `<div class="mark-box m-none">-</div>`;
+        if (!mark || mark === "-" || mark === "") return `<div class="mark-box m-none">-</div>`;
         const n = parseInt(mark);
+        if (isNaN(n)) return `<div class="mark-box m-none">-</div>`;
+        
         let cls = "m-none";
         if (n >= 1 && n <= 4) cls = "m-danger";
         else if (n >= 5 && n <= 6) cls = "m-warning";
@@ -103,20 +109,70 @@
         return `<div class="mark-box ${cls}">${n}</div>`;
     }
 
-    subjects.forEach(sub => {
-        const m1 = localStorage.getItem(`${currentStudent}_${sub}_Sem1`) || "-";
-        const m2 = localStorage.getItem(`${currentStudent}_${sub}_Sem2`) || "-";
-        const annual = localStorage.getItem(`${currentStudent}_${sub}_Annual`) || "-";
+    async function loadStudentMarks() {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'flex';
 
-        tbody.innerHTML += `
-            <tr>
-                <td class="subject-name">${sub}</td>
-                <td>${getMarkHTML(m1)}</td>
-                <td>${getMarkHTML(m2)}</td>
-                <td class="annual-col">${getMarkHTML(annual)}</td>
-            </tr>
-        `;
-    });
+        try {
+            // Հարցում ենք ուղարկում Google Sheets-ին
+            const response = await fetch(SCRIPT_URL);
+            const allData = await response.json();
+
+            // Փնտրում ենք այս աշակերտի տողը (B սյունակում՝ index 1)
+            const studentRow = allData.find(row => row[1] === currentStudent);
+            
+            const tbody = document.getElementById('marksBody');
+            tbody.innerHTML = '';
+
+            subjects.forEach((sub, index) => {
+                // Ենթադրենք աղյուսակում գնահատականը C սյունակում է (index 2)
+                // Եթե ունես մի քանի սյունակ (Sem1, Sem2), պետք է index-ները համապատասխանեցնել
+                const liveGrade = studentRow ? studentRow[2] : "-"; 
+                
+                // Ժամանակավոր օգտագործենք նաև localStorage-ը որպես backup
+                const m1 = liveGrade; // Այստեղ կարող ես փոխել ըստ քո Sheets-ի սյուների
+                const m2 = localStorage.getItem(`${currentStudent}_${sub}_Sem2`) || "-";
+                const annual = localStorage.getItem(`${currentStudent}_${sub}_Annual`) || "-";
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="subject-name">${sub}</td>
+                        <td>${getMarkHTML(m1)}</td>
+                        <td>${getMarkHTML(m2)}</td>
+                        <td class="annual-col">${getMarkHTML(annual)}</td>
+                    </tr>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Չհաջողվեց բեռնել տվյալները:", error);
+            // Եթե ինտերնետ չկա, ցույց տալ localStorage-ից
+            renderFromCache();
+        } finally {
+            overlay.style.display = 'none';
+        }
+    }
+
+    function renderFromCache() {
+        const tbody = document.getElementById('marksBody');
+        tbody.innerHTML = '';
+        subjects.forEach(sub => {
+            const m1 = localStorage.getItem(`${currentStudent}_${sub}_Sem1`) || "-";
+            const m2 = localStorage.getItem(`${currentStudent}_${sub}_Sem2`) || "-";
+            const annual = localStorage.getItem(`${currentStudent}_${sub}_Annual`) || "-";
+            tbody.innerHTML += `
+                <tr>
+                    <td class="subject-name">${sub}</td>
+                    <td>${getMarkHTML(m1)}</td>
+                    <td>${getMarkHTML(m2)}</td>
+                    <td class="annual-col">${getMarkHTML(annual)}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Էջը բացելիս միանգամից կանչում ենք ֆունկցիան
+    loadStudentMarks();
 </script>
 
 </body>
