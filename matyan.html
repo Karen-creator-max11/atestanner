@@ -74,9 +74,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLBJLU0pKaTS9eCQxAuYZnbjJyG-ViAeHjIVCl1Qw2iAtXeLYsIVgxJz0U3oQ_t1e_/exec";
-    let currentClass = '', currentView = ''; 
-    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     const studentsData = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
@@ -151,26 +149,39 @@
         const inputs = document.querySelectorAll('.mark-input');
         const saveBtn = document.getElementById('save-btn-ui');
         
-        inputs.forEach(input => {
-            localStorage.setItem(`${input.dataset.student}_${input.dataset.subject}_Sem${currentView}`, input.value);
-        });
-
         saveBtn.innerText = "ՈՒՂԱՐԿՎՈՒՄ Է...";
         saveBtn.disabled = true;
 
         let promises = [];
         inputs.forEach(input => {
-            if (input.value !== "") {
-                const url = `${SCRIPT_URL}?name=${encodeURIComponent(input.dataset.student)}&subject=${encodeURIComponent(input.dataset.subject)}&grade=${input.value}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
+            const student = input.dataset.student;
+            const subject = input.dataset.subject;
+            const newVal = input.value;
+            const storageKey = `${student}_${subject}_Sem${currentView}`;
+            const oldVal = localStorage.getItem(storageKey) || "";
+
+            // Ուղարկում ենք միայն եթե արժեքը փոխվել է (նաև եթե ջնջվել է)
+            if (newVal !== oldVal) {
+                localStorage.setItem(storageKey, newVal);
+                
+                // Կառուցում ենք URL-ը։ Եթե newVal-ը դատարկ է, Google Script-ը կջնջի տողը
+                const url = `${SCRIPT_URL}?name=${encodeURIComponent(student)}&subject=${encodeURIComponent(subject)}&grade=${newVal}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
                 promises.push(fetch(url, { method: 'POST' }));
             }
         });
 
+        if (promises.length === 0) {
+            alert("Փոփոխություն չկա:");
+            saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
+            saveBtn.disabled = false;
+            return;
+        }
+
         try {
             await Promise.all(promises);
-            alert(`Տվյալները հաջողությամբ պահպանվեցին Google Sheets-ում:`);
+            alert(`Փոփոխությունները հաջողությամբ պահպանվեցին (թարմացվեցին/ջնջվեցին):`);
         } catch (error) {
-            alert("Տեղային պահպանվեց, բայց Google Sheets-ի հետ կապի սխալ եղավ:");
+            alert("Սխալ տեղի ունեցավ Google Sheets-ի հետ կապի ժամանակ:");
             console.error(error);
         } finally {
             saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
