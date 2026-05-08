@@ -31,7 +31,6 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
     }
 
-    /* Վերնագրի հատվածը հարմարեցված հեռախոսին */
     .header-section { 
         display: flex; 
         flex-wrap: wrap; 
@@ -45,7 +44,6 @@
 
     h2 { font-size: 18px; color: var(--primary); margin: 0; }
 
-    /* Ընտրության կոճակների դասավորություն */
     .selector-box { 
         display: flex; 
         flex-direction: column; 
@@ -75,7 +73,6 @@
 
     .btn.active { background: var(--primary); color: white; }
 
-    /* ԱՂՅՈՒՍԱԿԻ ԿԱՐԳԱՎՈՐՈՒՄՆԵՐ (SCROLL & STICKY) */
     .table-wrapper { 
         overflow-x: auto; 
         border-radius: 12px; 
@@ -86,7 +83,7 @@
 
     table { 
         width: 100%; 
-        min-width: 900px; /* Թույլ չի տալիս սեղմվել */
+        min-width: 900px; 
         border-collapse: collapse; 
         background: white;
     }
@@ -106,7 +103,6 @@
         text-align: center; 
     }
 
-    /* Անունների սյունակի ֆիքսում ձախ կողմում */
     .student-name { 
         text-align: left; 
         padding-left: 15px; 
@@ -120,7 +116,6 @@
         min-width: 180px;
     }
 
-    /* ԳՆԱՀԱՏԱԿԱՆԻ ՎԱՆԴԱԿՆԵՐԻ ՍԼԱՔՆԵՐԻ ՀԵՌԱՑՈՒՄ */
     input[type="number"] { 
         font-family: sylfaen;
         width: 40px; 
@@ -131,17 +126,15 @@
         font-weight: bold; 
         font-size: 16px;
         outline: none;
-        -moz-appearance: textfield; /* Firefox */
+        -moz-appearance: textfield;
     }
 
-    /* Chrome, Safari, Edge, Opera */
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
-    /* Լրացուցիչ կոճակներ */
     .btn-ui { 
         padding: 8px 15px; 
         border-radius: 8px; 
@@ -179,6 +172,20 @@
         font-weight: bold;
         color: var(--primary);
     }
+
+    /* ՏՊԵԼՈՒ ԿԱՆՈՆՆԵՐ */
+    @media print {
+        .selector-box, .action-buttons, .logout-btn, #loading-overlay {
+            display: none !important;
+        }
+        body { background-color: white; padding: 0; }
+        .container { box-shadow: none; padding: 0; }
+        .table-wrapper { overflow: visible !important; border: none; }
+        table { min-width: 100% !important; border: 1px solid black; }
+        th, td { border: 1px solid black !important; }
+        .student-name { position: static !important; border-right: 1px solid black !important; }
+        input { border: none !important; background: transparent !important; }
+    }
 </style>
 </head>
 <body>
@@ -187,6 +194,7 @@
     <div class="header-section">
         <h2>Ուսուցչի Մատյան</h2>
         <div class="action-buttons">
+            <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
             <a href="index.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
         </div>
@@ -231,12 +239,11 @@
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
 
-    // Ֆունկցիա՝ Google Sheets-ից տվյալները թարմացնելու համար
     async function refreshData() {
         document.getElementById('loading-overlay').style.display = 'flex';
         try {
             const response = await fetch(SCRIPT_URL);
-            allData = await response.json(); // row[0]: Անուն, row[1]: Առարկա, row[2]: Գնահատական, row[3]: Կիսամյակ
+            allData = await response.json();
         } catch (e) { console.error("Բեռնման սխալ:", e); }
         document.getElementById('loading-overlay').style.display = 'none';
     }
@@ -253,8 +260,7 @@
         currentView = type;
         document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        
-        await refreshData(); // Ամեն անգամ կիսամյակ փոխելիս բեռնում ենք թարմ տվյալները Sheets-ից
+        await refreshData();
         renderTable();
     }
 
@@ -268,7 +274,6 @@
         studentsData[currentClass].forEach((student, rIdx) => {
             let cells = '';
             subjects.forEach((sub, cIdx) => {
-                // Փնտրում ենք գնահատականը բեռնված տվյալների մեջ
                 const markRow = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === String(currentView));
                 const val = markRow ? markRow[2] : "";
 
@@ -314,7 +319,7 @@
         try {
             await Promise.all(promises);
             alert("Տվյալները սինխրոնացվեցին Sheets-ի հետ:");
-            await refreshData(); // Պահպանելուց հետո թարմացնում ենք տեղային տվյալները
+            await refreshData();
             renderTable();
         } catch (e) { alert("Կապի սխալ:"); }
         
