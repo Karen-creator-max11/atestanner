@@ -5,47 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ուսուցչի Մատյան - Սինխրոնացված</title>
     <style>
-        /* Ոճերը մնում են նույնը */
-        :root { --primary: #4a90e2; --bg: #f0f4f8; --text: #2c3e50; --success: #2ecc71; --border: #dee2e6; --annual-color: #9b59b6; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--text); }
-        .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
-        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
-        .btn-ui { text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; transition: 0.3s; border: 2px solid; }
-        .save-btn-top { background: var(--success); color: white; border-color: var(--success); display: none; }
-        .logout-btn { color: #e74c3c; border-color: #e74c3c; background: white; }
-        .selector-box { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; }
-        .btn-group { display: flex; gap: 10px; }
-        .btn { padding: 12px 25px; cursor: pointer; border: 2px solid var(--primary); border-radius: 12px; background: white; color: var(--primary); font-weight: bold; transition: 0.3s; }
-        .btn.active { background: var(--primary); color: white; }
-        #semester-section { display: none; }
-        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; position: relative; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 15px 5px; border-bottom: 2px solid var(--border); font-size: 11px; }
-        td { padding: 10px 5px; border-bottom: 1px solid #f1f1f1; text-align: center; }
-        .student-name { text-align: left; padding-left: 20px; font-weight: 600; }
-/* Chrome, Safari, Edge, Opera-ի համար */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+    :root { 
+        --primary: #4a90e2; 
+        --bg: #f0f4f8; 
+        --text: #2c3e50; 
+        --success: #2ecc71; 
+        --border: #dee2e6; 
+        --annual-color: #9b59b6; 
+    }
 
-/* Firefox-ի համար */
-input[type=number] {
-  -moz-appearance: textfield;
-}
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background-color: var(--bg); 
+        margin: 0; 
+        padding: 10px; 
+        color: var(--text); 
+    }
 
-/* Ընդհանուր տեսքի համար (ըստ քո նախորդ կոդի) */
-input[type="number"] {
-    width: 45px;
-    height: 35px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    outline: none;
-}        #loading-overlay { display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); justify-content:center; align-items:center; font-weight:bold; z-index:10; }
-    </style>
+    .container { 
+        max-width: 100%; 
+        margin: auto; 
+        background: white; 
+        padding: 15px; 
+        border-radius: 15px; 
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+    }
+
+    /* Վերնագրի հատվածը հարմարեցված հեռախոսին */
+    .header-section { 
+        display: flex; 
+        flex-wrap: wrap; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 20px; 
+        gap: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    h2 { font-size: 18px; color: var(--primary); margin: 0; }
+
+    /* Ընտրության կոճակների դասավորություն */
+    .selector-box { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        gap: 12px; 
+        margin-bottom: 20px; 
+    }
+
+    .btn-group { 
+        display: flex; 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        gap: 8px; 
+    }
+
+    .btn { 
+        padding: 8px 16px; 
+        font-size: 13px; 
+        cursor: pointer; 
+        border: 2px solid var(--primary); 
+        border-radius: 10px; 
+        background: white; 
+        color: var(--primary); 
+        font-weight: bold; 
+        transition: 0.2s;
+    }
+
+    .btn.active { background: var(--primary); color: white; }
+
+    /* ԱՂՅՈՒՍԱԿԻ ԿԱՐԳԱՎՈՐՈՒՄՆԵՐ (SCROLL & STICKY) */
+    .table-wrapper { 
+        overflow-x: auto; 
+        border-radius: 12px; 
+        border: 1px solid var(--border); 
+        position: relative;
+        -webkit-overflow-scrolling: touch; 
+    }
+
+    table { 
+        width: 100%; 
+        min-width: 900px; /* Թույլ չի տալիս սեղմվել */
+        border-collapse: collapse; 
+        background: white;
+    }
+
+    th { 
+        background: #f8f9fa; 
+        padding: 12px 5px; 
+        font-size: 10px; 
+        border-bottom: 2px solid var(--border); 
+        color: #7f8c8d;
+        text-transform: uppercase;
+    }
+
+    td { 
+        padding: 8px 5px; 
+        border-bottom: 1px solid #f1f1f1; 
+        text-align: center; 
+    }
+
+    /* Անունների սյունակի ֆիքսում ձախ կողմում */
+    .student-name { 
+        text-align: left; 
+        padding-left: 15px; 
+        font-weight: 600; 
+        font-size: 14px;
+        position: sticky; 
+        left: 0; 
+        background: white; 
+        z-index: 5;
+        border-right: 2px solid var(--border);
+        min-width: 180px;
+    }
+
+    /* ԳՆԱՀԱՏԱԿԱՆԻ ՎԱՆԴԱԿՆԵՐԻ ՍԼԱՔՆԵՐԻ ՀԵՌԱՑՈՒՄ */
+    input[type="number"] { 
+        width: 40px; 
+        height: 32px; 
+        border: 1px solid #ddd; 
+        border-radius: 6px; 
+        text-align: center; 
+        font-weight: bold; 
+        font-size: 16px;
+        outline: none;
+        -moz-appearance: textfield; /* Firefox */
+    }
+
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Լրացուցիչ կոճակներ */
+    .btn-ui { 
+        padding: 8px 15px; 
+        border-radius: 8px; 
+        font-size: 12px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        text-decoration: none; 
+        display: inline-block;
+        transition: 0.3s;
+    }
+
+    .save-btn-top { 
+        background: var(--success); 
+        color: white; 
+        border: none; 
+        box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+    }
+
+    .save-btn-top:active { transform: scale(0.95); }
+
+    .logout-btn { 
+        color: #e74c3c; 
+        border: 1px solid #e74c3c; 
+        background: white; 
+    }
+
+    #loading-overlay {
+        display: none;
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.8);
+        z-index: 10;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        color: var(--primary);
+    }
+</style>
 </head>
 <body>
 
