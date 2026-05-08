@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ուսուցչի Մատյան - Վերջնական Կապ</title>
+    <title>Ուսուցչի Մատյան - Սինխրոնացված</title>
     <style>
+        /* Ոճերը մնում են նույնը */
         :root { --primary: #4a90e2; --bg: #f0f4f8; --text: #2c3e50; --success: #2ecc71; --border: #dee2e6; --annual-color: #9b59b6; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--text); }
         .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
         .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
-        h2 { margin: 0; color: var(--primary); font-size: 26px; }
-        .action-buttons { display: flex; gap: 10px; }
         .btn-ui { text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; transition: 0.3s; border: 2px solid; }
         .save-btn-top { background: var(--success); color: white; border-color: var(--success); display: none; }
         .logout-btn { color: #e74c3c; border-color: #e74c3c; background: white; }
@@ -18,26 +17,41 @@
         .btn-group { display: flex; gap: 10px; }
         .btn { padding: 12px 25px; cursor: pointer; border: 2px solid var(--primary); border-radius: 12px; background: white; color: var(--primary); font-weight: bold; transition: 0.3s; }
         .btn.active { background: var(--primary); color: white; }
-        .btn-annual { border-color: var(--annual-color); color: var(--annual-color); }
-        .btn-annual.active { background: var(--annual-color); color: white; }
-        #semester-section { display: none; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: #f8f9fa; font-size: 11px; padding: 15px 5px; border-bottom: 2px solid var(--border); text-transform: uppercase; color: #7f8c8d; }
+        #semester-section { display: none; }
+        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; position: relative; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 15px 5px; border-bottom: 2px solid var(--border); font-size: 11px; }
         td { padding: 10px 5px; border-bottom: 1px solid #f1f1f1; text-align: center; }
-        .student-name { text-align: left; padding-left: 20px; font-weight: 600; min-width: 200px; }
-        input[type="number"] { width: 45px; height: 35px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-weight: bold; outline: none; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        .annual-val { font-weight: bold; color: var(--annual-color); font-size: 18px; }
+        .student-name { text-align: left; padding-left: 20px; font-weight: 600; }
+/* Chrome, Safari, Edge, Opera-ի համար */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox-ի համար */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Ընդհանուր տեսքի համար (ըստ քո նախորդ կոդի) */
+input[type="number"] {
+    width: 45px;
+    height: 35px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    outline: none;
+}        #loading-overlay { display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); justify-content:center; align-items:center; font-weight:bold; z-index:10; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-section">
-        <h2>Ամփոփիչ Մատյան (Ուսուցիչ)</h2>
+        <h2>Ուսուցչի Մատյան</h2>
         <div class="action-buttons">
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
             <a href="index.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
@@ -52,13 +66,13 @@
         <div id="semester-section" class="btn-group">
             <button class="btn sem-btn" onclick="selectType(1, this)">1-ին Կիսամյակ</button>
             <button class="btn sem-btn" onclick="selectType(2, this)">2-րդ Կիսամյակ</button>
-            <button class="btn sem-btn btn-annual" onclick="selectType('annual', this)">ՏԱՐԵԿԱՆ</button>
+            <button class="btn sem-btn" style="border-color:#9b59b6; color:#9b59b6;" onclick="selectType('annual', this)">ՏԱՐԵԿԱՆ</button>
         </div>
     </div>
 
     <div id="marks-table-container" style="display:none;">
-        <h3 id="table-title" style="text-align: center; color: #7f8c8d; margin-bottom: 20px;"></h3>
         <div class="table-wrapper">
+            <div id="loading-overlay">Բեռնվում է...</div>
             <table>
                 <thead>
                     <tr>
@@ -74,11 +88,24 @@
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";
+    
+    let currentClass = '', currentView = '', allData = []; 
+    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     const studentsData = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
+
+    // Ֆունկցիա՝ Google Sheets-ից տվյալները թարմացնելու համար
+    async function refreshData() {
+        document.getElementById('loading-overlay').style.display = 'flex';
+        try {
+            const response = await fetch(SCRIPT_URL);
+            allData = await response.json(); // row[0]: Անուն, row[1]: Առարկա, row[2]: Գնահատական, row[3]: Կիսամյակ
+        } catch (e) { console.error("Բեռնման սխալ:", e); }
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
 
     function selectClass(cls, btn) {
         currentClass = cls;
@@ -86,20 +113,19 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMAp
         btn.classList.add('active');
         document.getElementById('semester-section').style.display = 'flex';
         document.getElementById('marks-table-container').style.display = 'none';
-        document.getElementById('save-btn-ui').style.display = 'none';
     }
 
-    function selectType(type, btn) {
+    async function selectType(type, btn) {
         currentView = type;
         document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        
+        await refreshData(); // Ամեն անգամ կիսամյակ փոխելիս բեռնում ենք թարմ տվյալները Sheets-ից
         renderTable();
     }
 
     function renderTable() {
         document.getElementById('marks-table-container').style.display = 'block';
-        document.getElementById('table-title').innerText = `${currentClass} դասարան - ` + (currentView === 'annual' ? "ՏԱՐԵԿԱՆ ԱՄՓՈՓՈՒՄ" : `${currentView}-րդ Կիսամյակ`);
-        
         document.getElementById('save-btn-ui').style.display = (currentView === 'annual') ? 'none' : 'block';
 
         const list = document.getElementById('students-list');
@@ -108,85 +134,58 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMAp
         studentsData[currentClass].forEach((student, rIdx) => {
             let cells = '';
             subjects.forEach((sub, cIdx) => {
+                // Փնտրում ենք գնահատականը բեռնված տվյալների մեջ
+                const markRow = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === String(currentView));
+                const val = markRow ? markRow[2] : "";
+
                 if (currentView === 'annual') {
-                    const m1 = parseFloat(localStorage.getItem(`${student}_${sub}_Sem1`)) || 0;
-                    const m2 = parseFloat(localStorage.getItem(`${student}_${sub}_Sem2`)) || 0;
+                    const m1Row = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === "1");
+                    const m2Row = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === "2");
+                    const m1 = m1Row ? parseFloat(m1Row[2]) : 0;
+                    const m2 = m2Row ? parseFloat(m2Row[2]) : 0;
                     let annual = (m1 > 0 && m2 > 0) ? Math.round((m1 + m2) / 2) : "-";
-                    
-                    if (annual !== "-") {
-                        localStorage.setItem(`${student}_${sub}_Annual`, annual);
-                    }
-                    cells += `<td><span class="annual-val">${annual}</span></td>`;
+                    cells += `<td><span style="font-weight:bold; color:#9b59b6;">${annual}</span></td>`;
                 } else {
-                    const val = localStorage.getItem(`${student}_${sub}_Sem${currentView}`) || "";
                     cells += `<td><input type="number" class="mark-input" data-student="${student}" data-subject="${sub}" 
-                               data-row="${rIdx}" data-col="${cIdx}" value="${val}" min="1" max="10" 
-                               oninput="validateMark(this)" onkeydown="navigate(event, this)"></td>`;
+                               data-original="${val}" value="${val}" min="1" max="10" oninput="validateMark(this)"></td>`;
                 }
             });
             list.innerHTML += `<tr><td>${rIdx+1}</td><td class="student-name">${student}</td>${cells}</tr>`;
         });
     }
 
-    function navigate(e, input) {
-        let r = parseInt(input.dataset.row), c = parseInt(input.dataset.col), target;
-        if(e.key === "ArrowDown") target = document.querySelector(`input[data-row="${r+1}"][data-col="${c}"]`);
-        if(e.key === "ArrowUp") target = document.querySelector(`input[data-row="${r-1}"][data-col="${c}"]`);
-        if(e.key === "ArrowRight") target = document.querySelector(`input[data-row="${r}"][data-col="${c+1}"]`);
-        if(e.key === "ArrowLeft") target = document.querySelector(`input[data-row="${r}"][data-col="${c-1}"]`);
-        if(target) { e.preventDefault(); target.focus(); }
-    }
-
     function validateMark(input) {
-        let v = input.value;
-        if(v !== "" && (parseInt(v) < 1 || parseInt(v) > 10 || v.includes('.') || v.includes(','))) {
-            alert("Մուտքագրեք 1-10 բնական թիվ");
-            input.value = "";
+        if(input.value !== "" && (parseInt(input.value) < 1 || parseInt(input.value) > 10)) {
+            alert("1-10 սահմանում"); input.value = "";
         }
     }
 
     async function saveAll() {
         const inputs = document.querySelectorAll('.mark-input');
         const saveBtn = document.getElementById('save-btn-ui');
-        
-        saveBtn.innerText = "ՈՒՂԱՐԿՎՈՒՄ Է...";
+        saveBtn.innerText = "ՊԱՀՊԱՆՎՈՒՄ Է...";
         saveBtn.disabled = true;
 
         let promises = [];
         inputs.forEach(input => {
-            const student = input.dataset.student;
-            const subject = input.dataset.subject;
             const newVal = input.value;
-            const storageKey = `${student}_${subject}_Sem${currentView}`;
-            const oldVal = localStorage.getItem(storageKey) || "";
+            const oldVal = input.dataset.original;
 
-            // Ուղարկում ենք միայն եթե արժեքը փոխվել է (նաև եթե ջնջվել է)
             if (newVal !== oldVal) {
-                localStorage.setItem(storageKey, newVal);
-                
-                // Կառուցում ենք URL-ը։ Եթե newVal-ը դատարկ է, Google Script-ը կջնջի տողը
-                const url = `${SCRIPT_URL}?name=${encodeURIComponent(student)}&subject=${encodeURIComponent(subject)}&grade=${newVal}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
+                const url = `${SCRIPT_URL}?name=${encodeURIComponent(input.dataset.student)}&subject=${encodeURIComponent(input.dataset.subject)}&grade=${encodeURIComponent(newVal)}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
                 promises.push(fetch(url, { method: 'POST' }));
             }
         });
 
-        if (promises.length === 0) {
-            alert("Փոփոխություն չկա:");
-            saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
-            saveBtn.disabled = false;
-            return;
-        }
-
         try {
             await Promise.all(promises);
-            alert(`Փոփոխությունները հաջողությամբ պահպանվեցին (թարմացվեցին/ջնջվեցին):`);
-        } catch (error) {
-            alert("Սխալ տեղի ունեցավ Google Sheets-ի հետ կապի ժամանակ:");
-            console.error(error);
-        } finally {
-            saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
-            saveBtn.disabled = false;
-        }
+            alert("Տվյալները սինխրոնացվեցին Sheets-ի հետ:");
+            await refreshData(); // Պահպանելուց հետո թարմացնում ենք տեղային տվյալները
+            renderTable();
+        } catch (e) { alert("Կապի սխալ:"); }
+        
+        saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
+        saveBtn.disabled = false;
     }
 </script>
 </body>
