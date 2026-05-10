@@ -31,9 +31,10 @@
 </div>
 
 <script>
-    // Ուսուցչի տվյալները
+    // Ուսուցչի տվյալները (Ծածկագրված Base64-ով)
     const TEACHER_USER = "teacher2024";
-    const TEACHER_PASS = "dproc123";
+    const TEACHER_PASS_ENCODED = "ZHByb2MxMjM="; // Սա "dproc123"-ն է
+    const STUDENT_PASS_ENCODED = "MTIzNDU=";    // Սա "12345"-ն է
 
     // Աշակերտների ցուցակը
     const students = [
@@ -52,16 +53,23 @@
         const pass = document.getElementById('password').value;
         const error = document.getElementById('error-msg');
 
-        // 1. Ստուգում ենք՝ արդյոք ուսուցիչն է
-        if (user === TEACHER_USER && pass === TEACHER_PASS) {
+        // Մաքրում ենք նախորդ սեսիաները
+        sessionStorage.removeItem('isLoggedIn');
+
+        // Գաղտնաբառը դարձնում ենք Base64
+        const encodedPass = btoa(pass);
+
+        // 1. Ստուգում ենք ուսուցչին
+        if (user === TEACHER_USER && encodedPass === TEACHER_PASS_ENCODED) {
+            sessionStorage.setItem('isLoggedIn', 'teacher');
             window.location.href = "matyan.html";
             return;
         }
 
-        // 2. Ստուգում ենք աշակերտների բազան
+        // 2. Աշակերտների ստուգում
         let nameCounts = {};
         students.forEach(s => {
-            let firstName = s.split(' ')[1]; // Վերցնում ենք Անունը
+            let firstName = s.split(' ')[1];
             nameCounts[firstName] = (nameCounts[firstName] || 0) + 1;
         });
 
@@ -73,12 +81,12 @@
             
             let finalUsername = firstName;
             if (nameCounts[firstName] > 1) {
-                finalUsername = firstName + "_" + lastName[0]; // Օրինակ՝ Արսեն_Ա
+                finalUsername = firstName + "_" + lastName[0];
             }
 
-            if (user === finalUsername && pass === "12345") {
+            if (user === finalUsername && encodedPass === STUDENT_PASS_ENCODED) {
                 studentFound = true;
-                // Պահում ենք աշակերտի անունը, որ հաջորդ էջում ցույց տանք իր գնահատականները
+                sessionStorage.setItem('isLoggedIn', 'student');
                 localStorage.setItem('studentName', s);
                 window.location.href = "student_view.html";
             }
