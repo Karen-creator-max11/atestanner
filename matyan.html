@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ուսուցչի Մատյան - Սինխրոնացված</title>
+    
+    <!-- ՊԱՇՏՊԱՆՈՒԹՅԱՆ ՍՏՈՒԳՈՒՄ (ՊԵՏՔ Է ԼԻՆԻ ԱՄԵՆԱՍԿԶԲՈՒՄ) -->
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
     <style>
     :root { 
         --primary: #4a90e2; 
@@ -173,7 +181,6 @@
         color: var(--primary);
     }
 
-    /* ՏՊԵԼՈՒ ԿԱՆՈՆՆԵՐ */
     @media print {
         .selector-box, .action-buttons, .logout-btn, #loading-overlay {
             display: none !important;
@@ -196,7 +203,8 @@
         <div class="action-buttons">
             <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
-            <a href="index.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
+            <!-- ԴՈՒՐՍ ԳԱԼՈՒ ԺԱՄԱՆԱԿ ՋՆՋՈՒՄ ԵՆՔ LOGIN-Ի ՏՎՅԱԼԸ -->
+            <a href="index.html" class="btn-ui logout-btn" onclick="localStorage.removeItem('isLoggedIn')">ԴՈՒՐՍ ԳԱԼ</a>
         </div>
     </div>
 
