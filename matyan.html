@@ -316,18 +316,24 @@
     let currentClass = '', currentView = '', allData = []; 
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     
-    // Սկզբնական տվյալներ, եթե localStorage-ում դեռ ոչինչ չկա
+    // Քո հին ունեցած 11ա և 12ա դասարանների աշակերտների ցուցակը
     const defaultClasses = ['11ա', '12ա'];
     const defaultStudents = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
 
-    // Բեռնում ենք տվյալները LocalStorage-ից կամ սահմանում ենք լռելյայն արժեքները
-    let classesList = JSON.parse(localStorage.getItem("classesList")) || defaultClasses;
-    let studentsData = JSON.parse(localStorage.getItem("studentsData")) || defaultStudents;
+    // ՃԻՇՏ ՍՏՈՒԳՈՒՄ՝ եթե արդեն կան տվյալներ, LocalStorage-ը ՉԻ ՋՆՋՎՈՒՄ
+    if (!localStorage.getItem("classesList")) {
+        localStorage.setItem("classesList", JSON.stringify(defaultClasses));
+    }
+    if (!localStorage.getItem("studentsData")) {
+        localStorage.setItem("studentsData", JSON.stringify(defaultStudents));
+    }
 
-    // Պահպանում ենք աշակերտների մուտքային տվյալները (Login/Password) հեշտ հասանելիության համար
+    let classesList = JSON.parse(localStorage.getItem("classesList"));
+    let studentsData = JSON.parse(localStorage.getItem("studentsData"));
+
     function updateStudentLogins() {
         let studentUsers = {};
         classesList.forEach(cls => {
@@ -346,14 +352,12 @@
     }
 
     function initUI() {
-        // Գեներացնում ենք դասարանների կոճակները
         const btnGroup = document.getElementById('class-buttons-group');
         btnGroup.innerHTML = '';
         classesList.forEach(cls => {
             btnGroup.innerHTML += `<button class="btn class-btn" onclick="selectClass('${cls}', this)">${cls} Դասարան</button>`;
         });
 
-        // Գեներացնում ենք սելեկտը ադմինում
         const select = document.getElementById('student-class-select');
         select.innerHTML = '';
         classesList.forEach(cls => {
@@ -521,7 +525,7 @@
         saveBtn.disabled = false;
     }
 
-    // Ինիցիալիզացիա բեռնելիս
+    // Միացնում ենք էկրանները
     initUI();
 </script>
 </body>
