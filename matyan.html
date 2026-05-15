@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
+    <script>
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "index.html";
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ուսուցչի Մատյան - Սինխրոնացված</title>
@@ -11,7 +16,7 @@
         --text: #2c3e50; 
         --success: #2ecc71; 
         --border: #dee2e6; 
-        --annual-color: #9b59b6; 
+        --danger: #e74c3c;
     }
 
     body { 
@@ -78,7 +83,6 @@
         border-radius: 12px; 
         border: 1px solid var(--border); 
         position: relative;
-        -webkit-overflow-scrolling: touch; 
     }
 
     table { 
@@ -94,7 +98,6 @@
         font-size: 10px; 
         border-bottom: 2px solid var(--border); 
         color: #7f8c8d;
-        text-transform: uppercase;
     }
 
     td { 
@@ -116,23 +119,24 @@
         min-width: 180px;
     }
 
+    /* ԳՆԱՀԱՏԱԿԱՆՆԵՐԻ ՄԳԵՑՈՒՄ ԵՎ ՍԼԱՔՆԵՐԻ ՀԵՌԱՑՈՒՄ */
     input[type="number"] { 
-        font-family: sylfaen;
+        font-family: 'Sylfaen', sans-serif;
         width: 40px; 
         height: 32px; 
         border: 1px solid #ddd; 
         border-radius: 6px; 
         text-align: center; 
-        font-weight: bold; 
+        font-weight: 800; /* Մգեցված */
+        color: #000;      /* Սև գույն */
         font-size: 16px;
-        outline: none;
-        -moz-appearance: textfield;
+        -moz-appearance: textfield; /* Firefox-ի համար */
     }
 
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+    input[type="number"]::-webkit-inner-spin-button, 
+    input[type="number"]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; /* Chrome/Safari-ի սլաքները հեռացնել */
+        margin: 0; 
     }
 
     .btn-ui { 
@@ -141,51 +145,28 @@
         font-size: 12px; 
         font-weight: bold; 
         cursor: pointer; 
-        text-decoration: none; 
-        display: inline-block;
         transition: 0.3s;
     }
 
-    .save-btn-top { 
-        background: var(--success); 
-        color: white; 
-        border: none; 
-        box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+    .save-btn-top { background: var(--success); color: white; border: none; }
+    .logout-btn { color: var(--danger); border: 1px solid var(--danger); background: white; }
+
+    .modal {
+        display: none; position: fixed; z-index: 100; left: 0; top: 0; 
+        width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); 
     }
 
-    .save-btn-top:active { transform: scale(0.95); }
-
-    .logout-btn { 
-        color: #e74c3c; 
-        border: 1px solid #e74c3c; 
-        background: white; 
+    .modal-content {
+        background-color: #fefefe; margin: 5% auto; padding: 20px;
+        border-radius: 12px; width: 80%; max-width: 800px;
     }
 
-    #loading-overlay {
-        display: none;
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255,255,255,0.8);
-        z-index: 10;
-        justify-content: center;
-        align-items: center;
-        font-weight: bold;
-        color: var(--primary);
+    .admin-form-group {
+        display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;
+        background: #f8f9fa; padding: 15px; border-radius: 8px; align-items: center;
     }
 
-    /* ՏՊԵԼՈՒ ԿԱՆՈՆՆԵՐ */
-    @media print {
-        .selector-box, .action-buttons, .logout-btn, #loading-overlay {
-            display: none !important;
-        }
-        body { background-color: white; padding: 0; }
-        .container { box-shadow: none; padding: 0; }
-        .table-wrapper { overflow: visible !important; border: none; }
-        table { min-width: 100% !important; border: 1px solid black; }
-        th, td { border: 1px solid black !important; }
-        .student-name { position: static !important; border-right: 1px solid black !important; }
-        input { border: none !important; background: transparent !important; }
-    }
+    .admin-input { padding: 8px; border: 1px solid var(--border); border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -194,18 +175,16 @@
     <div class="header-section">
         <h2>Ուսուցչի Մատյան</h2>
         <div class="action-buttons">
+            <button class="btn-ui" style="background: #e67e22; color: white; border: none;" onclick="openAdminModal()">ԿԱՌԱՎԱՐՈՒՄ</button>
             <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
-            <a href="index.html" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</a>
+            <button onclick="logout()" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</button>
         </div>
     </div>
 
     <div class="selector-box">
-        <div class="btn-group">
-            <button class="btn class-btn" onclick="selectClass('11ա', this)">11ա Դասարան</button>
-            <button class="btn class-btn" onclick="selectClass('12ա', this)">12ա Դասարան</button>
-        </div>
-        <div id="semester-section" class="btn-group">
+        <div id="class-buttons-group" class="btn-group"></div>
+        <div id="semester-section" class="btn-group" style="display:none;">
             <button class="btn sem-btn" onclick="selectType(1, this)">1-ին Կիսամյակ</button>
             <button class="btn sem-btn" onclick="selectType(2, this)">2-րդ Կիսամյակ</button>
             <button class="btn sem-btn" style="border-color:#9b59b6; color:#9b59b6;" onclick="selectType('annual', this)">ՏԱՐԵԿԱՆ</button>
@@ -214,12 +193,12 @@
 
     <div id="marks-table-container" style="display:none;">
         <div class="table-wrapper">
-            <div id="loading-overlay">Բեռնվում է...</div>
-            <table>
+            <div id="loading-overlay" style="display:none; position: absolute; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:10; justify-content:center; align-items:center;">Բեռնվում է...</div>
+            <table id="main-marks-table">
                 <thead>
                     <tr>
                         <th>#</th><th class="student-name">Աշակերտ</th>
-                        <th>Հանրահաշիվ</th><th>Երկրաչափ.</th><th>Ֆիզիկա</th><th>Հայոց Լեզու</th><th>Գրական.</th>
+                        <th>Հանրահաշիվ</th><th>Երկրաչափ.</th><th>Ֆիզիկա</th><th>Հայոց Lեզու</th><th>Գրական.</th>
                         <th>Պատմություն</th><th>Օտար Լեզու</th><th>Ռուսաց Լեզու</th><th>Ինֆորմատ.</th><th>Հասարակագ.</th>
                     </tr>
                 </thead>
@@ -229,22 +208,60 @@
     </div>
 </div>
 
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" style="float:right; cursor:pointer; font-size: 24px;" onclick="closeAdminModal()">&times;</span>
+        <h3>Կառավարման վահանակ</h3>
+        <hr>
+        <h4>Ավելացնել Դասարան</h4>
+        <div class="admin-form-group">
+            <input type="text" id="new-class-name" class="admin-input" placeholder="Օրինակ՝ 10բ">
+            <button class="btn-ui" style="background:var(--primary); color:white; border:none;" onclick="addNewClass()">Ստեղծել Դասարան</button>
+        </div>
+        <h4>Գրանցել Նոր Աշակերտ</h4>
+        <div class="admin-form-group">
+            <select id="student-class-select" class="admin-input"></select>
+            <input type="text" id="new-student-name" class="admin-input" placeholder="Ազգանուն Անուն">
+            <button class="btn-ui" style="background:var(--success); color:white; border:none;" onclick="addNewStudent()">Գրանցել Աշակերտին</button>
+        </div>
+        <h4>Գրանցված Աշակերտներ</h4>
+        <div style="overflow-x:auto; max-height: 250px;">
+            <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+                <thead style="background:#eee;">
+                    <tr><th>Դասարան</th><th>Աշակերտ</th><th>Username</th><th>Password</th></tr>
+                </thead>
+                <tbody id="admin-students-list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script>
+    function logout() { localStorage.removeItem("isLoggedIn"); window.location.href = "index.html"; }
+
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";
-    
     let currentClass = '', currentView = '', allData = []; 
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
-    const studentsData = {
-        '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
-        '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
-    };
+    
+    let studentsData = JSON.parse(localStorage.getItem("studentsData")) || {};
+    let studentsLogins = JSON.parse(localStorage.getItem("studentsLogins")) || {};
+
+    window.onload = function() { renderClassButtons(); addNavigationSupport(); };
+
+    function renderClassButtons() {
+        const btnGroup = document.getElementById('class-buttons-group');
+        btnGroup.innerHTML = '';
+        Object.keys(studentsData).sort().forEach(cls => {
+            btnGroup.innerHTML += `<button class="btn class-btn" onclick="selectClass('${cls}', this)">${cls} Դասարան</button>`;
+        });
+    }
 
     async function refreshData() {
         document.getElementById('loading-overlay').style.display = 'flex';
         try {
             const response = await fetch(SCRIPT_URL);
             allData = await response.json();
-        } catch (e) { console.error("Բեռնման սխալ:", e); }
+        } catch (e) { console.error(e); }
         document.getElementById('loading-overlay').style.display = 'none';
     }
 
@@ -266,37 +283,49 @@
 
     function renderTable() {
         document.getElementById('marks-table-container').style.display = 'block';
-        document.getElementById('save-btn-ui').style.display = (currentView === 'annual') ? 'none' : 'block';
-
         const list = document.getElementById('students-list');
         list.innerHTML = '';
-
-        studentsData[currentClass].forEach((student, rIdx) => {
+        (studentsData[currentClass] || []).forEach((student, rIdx) => {
             let cells = '';
             subjects.forEach((sub, cIdx) => {
                 const markRow = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === String(currentView));
                 const val = markRow ? markRow[2] : "";
-
-                if (currentView === 'annual') {
-                    const m1Row = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === "1");
-                    const m2Row = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === "2");
-                    const m1 = m1Row ? parseFloat(m1Row[2]) : 0;
-                    const m2 = m2Row ? parseFloat(m2Row[2]) : 0;
-                    let annual = (m1 > 0 && m2 > 0) ? Math.round((m1 + m2) / 2) : "-";
-                    cells += `<td><span style="font-weight:bold; color:#9b59b6;">${annual}</span></td>`;
-                } else {
-                    cells += `<td><input type="number" class="mark-input" data-student="${student}" data-subject="${sub}" 
-                               data-original="${val}" value="${val}" min="1" max="10" oninput="validateMark(this)"></td>`;
-                }
+                cells += `<td><input type="number" class="mark-input" data-row="${rIdx}" data-col="${cIdx}" data-student="${student}" data-subject="${sub}" data-original="${val}" value="${val}"></td>`;
             });
             list.innerHTML += `<tr><td>${rIdx+1}</td><td class="student-name">${student}</td>${cells}</tr>`;
         });
     }
 
-    function validateMark(input) {
-        if(input.value !== "" && (parseInt(input.value) < 1 || parseInt(input.value) > 10)) {
-            alert("1-10 սահմանում"); input.value = "";
-        }
+    // ՍՏԵՂՆԱՇԱՐԻ ՍԼԱՔՆԵՐՈՎ ՏԵՂԱՇԱՐԺԻ ՖՈՒՆԿՑԻԱ
+    function addNavigationSupport() {
+        document.addEventListener('keydown', function(e) {
+            if (!e.target.classList.contains('mark-input')) return;
+
+            const row = parseInt(e.target.dataset.row);
+            const col = parseInt(e.target.dataset.col);
+            let nextInput;
+
+            switch(e.key) {
+                case "ArrowRight":
+                    nextInput = document.querySelector(`.mark-input[data-row="${row}"][data-col="${col + 1}"]`);
+                    break;
+                case "ArrowLeft":
+                    nextInput = document.querySelector(`.mark-input[data-row="${row}"][data-col="${col - 1}"]`);
+                    break;
+                case "ArrowDown":
+                    nextInput = document.querySelector(`.mark-input[data-row="${row + 1}"][data-col="${col}"]`);
+                    break;
+                case "ArrowUp":
+                    nextInput = document.querySelector(`.mark-input[data-row="${row - 1}"][data-col="${col}"]`);
+                    break;
+            }
+
+            if (nextInput) {
+                e.preventDefault();
+                nextInput.focus();
+                nextInput.select(); // Ավտոմատ նշել պարունակությունը
+            }
+        });
     }
 
     async function saveAll() {
@@ -304,27 +333,68 @@
         const saveBtn = document.getElementById('save-btn-ui');
         saveBtn.innerText = "ՊԱՀՊԱՆՎՈՒՄ Է...";
         saveBtn.disabled = true;
-
         let promises = [];
         inputs.forEach(input => {
-            const newVal = input.value;
-            const oldVal = input.dataset.original;
-
-            if (newVal !== oldVal) {
-                const url = `${SCRIPT_URL}?name=${encodeURIComponent(input.dataset.student)}&subject=${encodeURIComponent(input.dataset.subject)}&grade=${encodeURIComponent(newVal)}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
+            if (input.value !== input.dataset.original) {
+                const url = `${SCRIPT_URL}?name=${encodeURIComponent(input.dataset.student)}&subject=${encodeURIComponent(input.dataset.subject)}&grade=${encodeURIComponent(input.value)}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
                 promises.push(fetch(url, { method: 'POST' }));
             }
         });
-
-        try {
-            await Promise.all(promises);
-            alert("Տվյալները սինխրոնացվեցին Sheets-ի հետ:");
-            await refreshData();
-            renderTable();
-        } catch (e) { alert("Կապի սխալ:"); }
-        
+        await Promise.all(promises);
+        alert("Պահպանվեց:");
+        await refreshData();
+        renderTable();
         saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
         saveBtn.disabled = false;
+    }
+
+    function openAdminModal() {
+        document.getElementById('adminModal').style.display = 'block';
+        const select = document.getElementById('student-class-select');
+        select.innerHTML = Object.keys(studentsData).sort().map(c => `<option value="${c}">${c}</option>`).join('');
+        renderAdminStudentsTable();
+    }
+
+    function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+    function addNewClass() {
+        const name = document.getElementById('new-class-name').value.trim();
+        if (name && !studentsData[name]) {
+            studentsData[name] = [];
+            localStorage.setItem("studentsData", JSON.stringify(studentsData));
+            renderClassButtons();
+            openAdminModal();
+            document.getElementById('new-class-name').value = '';
+        }
+    }
+
+    function addNewStudent() {
+        const cls = document.getElementById('student-class-select').value;
+        const inputName = document.getElementById('new-student-name').value.trim();
+        if (!inputName || !cls) return;
+        const parts = inputName.split(/\s+/);
+        if (parts.length < 2) { alert("Գրեք Ազգանուն Անուն"); return; }
+        const journalName = parts[0] + " " + parts[1];
+        const loginName = parts[1] + "_" + parts[0];
+        if (!studentsData[cls].includes(journalName)) {
+            studentsData[cls].push(journalName);
+            studentsLogins[journalName] = { username: loginName, password: "12345", studentClass: cls };
+            localStorage.setItem("studentsData", JSON.stringify(studentsData));
+            localStorage.setItem("studentsLogins", JSON.stringify(studentsLogins));
+            renderAdminStudentsTable();
+            document.getElementById('new-student-name').value = '';
+        }
+    }
+
+    function renderAdminStudentsTable() {
+        const tbody = document.getElementById('admin-students-list');
+        tbody.innerHTML = '';
+        Object.keys(studentsData).sort().forEach(cls => {
+            studentsData[cls].forEach(st => {
+                const info = studentsLogins[st] || { username: '-', password: '12345' };
+                tbody.innerHTML += `<tr><td>${cls}</td><td>${st}</td><td><b>${info.username}</b></td><td>${info.password}</td></tr>`;
+            });
+        });
     }
 </script>
 </body>
