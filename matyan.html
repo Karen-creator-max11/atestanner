@@ -122,7 +122,7 @@
         min-width: 180px;
     }
 
-    input[type="number"], .admin-input { 
+    input[type="number"] { 
         font-family: sylfaen;
         width: 40px; 
         height: 32px; 
@@ -132,21 +132,7 @@
         font-weight: bold; 
         font-size: 16px;
         outline: none;
-    }
-
-    .admin-input {
-        width: 200px;
-        text-align: left;
-        padding: 0 10px;
-        font-size: 14px;
-    }
-
-    select {
-        font-family: sylfaen;
-        height: 34px;
-        padding: 0 10px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
+        -moz-appearance: textfield;
     }
 
     input::-webkit-outer-spin-button,
@@ -193,32 +179,8 @@
         color: var(--primary);
     }
 
-    /* Ադմին պանելի ոճեր */
-    .admin-panel {
-        display: none;
-        background: #fdfdfd;
-        border: 2px dashed var(--primary);
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
-    .admin-section {
-        margin-bottom: 15px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-    }
-    .admin-table {
-        min-width: 100% !important;
-        margin-top: 15px;
-    }
-    .admin-table th {
-        background: #eaeff5;
-    }
-
     @media print {
-        .selector-box, .action-buttons, .logout-btn, #loading-overlay, .admin-panel, #admin-toggle-btn {
+        .selector-box, .action-buttons, .logout-btn, #loading-overlay {
             display: none !important;
         }
         body { background-color: white; padding: 0; }
@@ -237,50 +199,18 @@
     <div class="header-section">
         <h2>Ուսուցչի Մատյան</h2>
         <div class="action-buttons">
-            <button id="admin-toggle-btn" class="btn-ui" style="background: #e67e22; color: white; border: none;" onclick="toggleAdminPanel()">ԿԱՌԱՎԱՐՈՒՄ</button>
             <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
             <button onclick="logout()" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</button>
         </div>
     </div>
 
-    <!-- Կառավարման Վահանակ -->
-    <div id="admin-panel" class="admin-panel">
-        <h3>Կառավարման Վահանակ</h3>
-        <hr>
-        <div class="admin-section">
-            <h4>Ավելացնել Դասարան:</h4>
-            <input type="text" id="new-class-name" class="admin-input" placeholder="Օրինակ՝ 10բ">
-            <button class="btn" onclick="addNewClass()">Ավելացնել Դասարան</button>
-        </div>
-        <div class="admin-section">
-            <h4>Ավելացնել Աշակերտ:</h4>
-            <input type="text" id="new-student-name" class="admin-input" placeholder="Ազգանուն Անուն">
-            <select id="student-class-select"></select>
-            <button class="btn" onclick="addNewStudent()">Ավելացնել Աշակերտ</button>
-        </div>
-        <hr>
-        <h4>Բոլոր Գրանցված Աշակերտները</h4>
-        <div class="table-wrapper">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Աշակերտ</th>
-                        <th>Դասարան</th>
-                        <th>Լոգին</th>
-                        <th>Գաղտնաբառ</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-students-list"></tbody>
-            </table>
-        </div>
-    </div>
-
     <div class="selector-box">
-        <div id="class-buttons-group" class="btn-group">
-            <!-- Դասարանների կոճակները կգեներացվեն ավտոմատ -->
+        <div class="btn-group">
+            <button class="btn class-btn" onclick="selectClass('11ա', this)">11ա Դասարան</button>
+            <button class="btn class-btn" onclick="selectClass('12ա', this)">12ա Դասարան</button>
         </div>
-        <div id="semester-section" class="btn-group" style="display:none;">
+        <div id="semester-section" class="btn-group">
             <button class="btn sem-btn" onclick="selectType(1, this)">1-ին Կիսամյակ</button>
             <button class="btn sem-btn" onclick="selectType(2, this)">2-րդ Կիսամյակ</button>
             <button class="btn sem-btn" style="border-color:#9b59b6; color:#9b59b6;" onclick="selectType('annual', this)">ՏԱՐԵԿԱՆ</button>
@@ -315,123 +245,10 @@
     
     let currentClass = '', currentView = '', allData = []; 
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
-    
-    // Սկզբնական աշակերտների ցուցակը
-    const defaultClasses = ['11ա', '12ա'];
-    const defaultStudents = {
-        '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելา', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
+    const studentsData = {
+        '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
-
-    // ԲՐԱՈՒԶԵՐԻ ՍՏՈՒԳՈՒՄ՝ Եթե հին սխալ տարբերակից դատարկվել էր, ստիպողաբար հետ ենք բերում ցուցակը
-    let storedClasses = localStorage.getItem("classesList");
-    let storedStudents = localStorage.getItem("studentsData");
-
-    if (!storedClasses || storedClasses === "[]" || !storedStudents || storedStudents === "{}") {
-        localStorage.setItem("classesList", JSON.stringify(defaultClasses));
-        localStorage.setItem("studentsData", JSON.stringify(defaultStudents));
-    }
-
-    let classesList = JSON.parse(localStorage.getItem("classesList"));
-    let studentsData = JSON.parse(localStorage.getItem("studentsData"));
-
-    function updateStudentLogins() {
-        let studentUsers = {};
-        classesList.forEach(cls => {
-            if (studentsData[cls]) {
-                studentsData[cls].forEach(student => {
-                    let login = student.trim().replace(/\s+/g, '_');
-                    studentUsers[login] = {
-                        name: student,
-                        class: cls,
-                        password: "12345"
-                    };
-                });
-            }
-        });
-        localStorage.setItem("studentUsers", JSON.stringify(studentUsers));
-    }
-
-    function initUI() {
-        const btnGroup = document.getElementById('class-buttons-group');
-        btnGroup.innerHTML = '';
-        classesList.forEach(cls => {
-            btnGroup.innerHTML += `<button class="btn class-btn" onclick="selectClass('${cls}', this)">${cls} Դասարան</button>`;
-        });
-
-        const select = document.getElementById('student-class-select');
-        select.innerHTML = '';
-        classesList.forEach(cls => {
-            select.innerHTML += `<option value="${cls}">${cls}</option>`;
-        });
-
-        updateStudentLogins();
-        renderAdminStudents();
-    }
-
-    function toggleAdminPanel() {
-        const panel = document.getElementById('admin-panel');
-        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
-    }
-
-    function addNewClass() {
-        const classNameInput = document.getElementById('new-class-name');
-        const className = classNameInput.value.trim();
-        if (className === '') return alert('Մուտքագրեք դասարանի անունը');
-        if (classesList.includes(className)) return alert('Այս դասարանը արդեն գոյություն ունի');
-
-        classesList.push(className);
-        studentsData[className] = [];
-        
-        localStorage.setItem("classesList", JSON.stringify(classesList));
-        localStorage.setItem("studentsData", JSON.stringify(studentsData));
-        
-        classNameInput.value = '';
-        initUI();
-        alert('Դասարանը ավելացվեց');
-    }
-
-    function addNewStudent() {
-        const studentNameInput = document.getElementById('new-student-name');
-        const studentName = studentNameInput.value.trim();
-        const selectedClass = document.getElementById('student-class-select').value;
-
-        if (studentName === '') return alert('Մուտքագրեք աշակերտի Անուն Ազգանունը');
-        if (!selectedClass) return alert('Նախ ընտրեք կամ ստեղծեք դասարան');
-
-        if (!studentsData[selectedClass]) {
-            studentsData[selectedClass] = [];
-        }
-        studentsData[selectedClass].push(studentName);
-
-        localStorage.setItem("studentsData", JSON.stringify(studentsData));
-        
-        studentNameInput.value = '';
-        updateStudentLogins();
-        renderAdminStudents();
-        if(currentClass === selectedClass && currentView !== '') {
-            renderTable();
-        }
-        alert('Աշակերտը ավելացվեց');
-    }
-
-    function renderAdminStudents() {
-        const tbody = document.getElementById('admin-students-list');
-        tbody.innerHTML = '';
-        classesList.forEach(cls => {
-            if (studentsData[cls]) {
-                studentsData[cls].forEach(student => {
-                    let login = student.trim().replace(/\s+/g, '_');
-                    tbody.innerHTML += `<tr>
-                        <td style="text-align:left; padding-left:15px; font-weight:600;">${student}</td>
-                        <td>${cls}</td>
-                        <td><code style="background:#eee; padding:2px 5px; border-radius:4px;">${login}</code></td>
-                        <td><code>12345</code></td>
-                    </tr>`;
-                });
-            }
-        });
-    }
 
     async function refreshData() {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -464,11 +281,6 @@
 
         const list = document.getElementById('students-list');
         list.innerHTML = '';
-
-        if (!studentsData[currentClass] || studentsData[currentClass].length === 0) {
-            list.innerHTML = '<tr><td colspan="12">Այս դասարանում աշակերտներ չկան</td></tr>';
-            return;
-        }
 
         studentsData[currentClass].forEach((student, rIdx) => {
             let cells = '';
@@ -525,9 +337,6 @@
         saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
         saveBtn.disabled = false;
     }
-
-    // Միացնում ենք համակարգը
-    initUI();
 </script>
 </body>
 </html>

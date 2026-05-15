@@ -19,55 +19,78 @@
 
 <div class="login-container">
     <h2>Մուտք Համակարգ</h2>
-    <input type="text" id="username" placeholder="Օգտանուն (Login)">
+    <input type="text" id="username" placeholder="Օգտանուն">
     <input type="password" id="password" placeholder="Գաղտնաբառ">
     <button onclick="handleLogin()">Մուտք գործել</button>
     <div id="error-msg" class="error">Սխալ օգտանուն կամ գաղտնաբառ</div>
     
     <div class="hint">
         * Ուսուցիչների համար՝ հատուկ ID<br>
-        * Աշակերտների համար՝ Ուսուցչի տրամադրած լոգինը և գաղտնաբառը
+        * Աշակերտների համար՝ Անուն կամ Անուն_ԱզգանվանԱռաջինՏառ
     </div>
 </div>
 
 <script>
     const TEACHER_USER = "teacher2024";
     const TEACHER_PASS_ENCODED = "ZHByb2MxMjM="; 
+    const STUDENT_PASS_ENCODED = "MTIzNDU=";    
+
+    const students = [
+        "Աբգարյան Տաթևիկ", "Աղեկյան Մանվել", "Արամյան Արսեն", "Արզումանյան Անժելա", "Բաբայան Արյուսակ",
+        "Բաղդասարյան Արյուսակ", "Բունիաթյան Գոհար", "Գասպարյան Արսեն", "Գյուլումյան Հասմիկ", "Գրիգորյան Աննա",
+        "Զաքարյան Աշխեն", "Խալաթյան Աշխեն", "Կարապետյան Ալիսա", "Հովհաննիսյան Մելինե", "Մեսրոպյան Սոնա",
+        "Մուրադյան Արսեն", "Ներսիսյան Մարինա", "Նիկողոսյան Մարգարիտ", "Շահբազյան Լիլիա", "Սուքիսյան Նարինե",
+        "Աբելյան Զարուհի", "Աբրահամյան Լիլիա", "Գյուլումյան Վահե", "Դավթյան Կարեն", "Դիլանյան Աննա",
+        "Զալյան Արման", "Թադևոսյան Սյուզան", "Իգիթյան Սոնա", "Լևոնյան Արթեմ", "Կարապետյան Լիլիթ",
+        "Կիրակոսյան Ռոզա", "Կիրակոսյան Ալիսա", "Հակոբջանյան Անի", "Մամիկոնյան Ռուբեն", "Նահապետյան Գայանե",
+        "Սահակյան Կարեն", "Վանյան Արյուսակ", "Փայտյան Հրայր", "Քյարունյան Կարեն", "Օհաննիսյան Հակոբ"
+    ];
 
     function handleLogin() {
         const user = document.getElementById('username').value.trim();
-        const pass = document.getElementById('password').value.trim();
+        const pass = document.getElementById('password').value;
         const error = document.getElementById('error-msg');
 
-        // Մաքրում ենք հին սեսիաները
+        // Մաքրում ենք հին տվյալները
         sessionStorage.removeItem('isLoggedIn');
         localStorage.removeItem('isLoggedIn');
 
         const encodedPass = btoa(pass);
 
-        // 1. Ուսուցչի մուտքի ստուգում
+        // 1. Ուսուցչի մուտք
         if (user === TEACHER_USER && encodedPass === TEACHER_PASS_ENCODED) {
             sessionStorage.setItem('isLoggedIn', 'teacher');
-            localStorage.setItem('isLoggedIn', 'true');
-            window.location.href = "matyan.html"; // Ուսուցչի էջը
+            localStorage.setItem('isLoggedIn', 'true'); // Սա մատյանի էջի համար է
+            window.location.href = "matyan.html";
             return;
         }
 
-        // 2. Աշակերտների մուտքի ստուգում (LocalStorage բազայից)
-        const studentsLogins = JSON.parse(localStorage.getItem("studentsLogins")) || {};
-        let studentFound = false;
+        // 2. Աշակերտների մուտք
+        let nameCounts = {};
+        students.forEach(s => {
+            let firstName = s.split(' ')[1];
+            nameCounts[firstName] = (nameCounts[firstName] || 0) + 1;
+        });
 
-        // Փնտրում ենք բազայում համապատասխան լոգինով աշակերտին
-        for (let studentName in studentsLogins) {
-            if (studentsLogins[studentName].username === user && studentsLogins[studentName].password === pass) {
+        let studentFound = false;
+        students.forEach(s => {
+            const parts = s.split(' ');
+            const lastName = parts[0];
+            const firstName = parts[1];
+            
+            let finalUsername = firstName;
+            if (nameCounts[firstName] > 1) {
+                finalUsername = firstName + "_" + lastName[0];
+            }
+
+            if (user === finalUsername && encodedPass === STUDENT_PASS_ENCODED) {
                 studentFound = true;
                 sessionStorage.setItem('isLoggedIn', 'student');
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('studentName', studentName); // Պահում ենք աշակերտի անունը իր էջի համար
-                window.location.href = "student_view.html"; // Աշակերտի էջը
-                break;
+                localStorage.setItem('isLoggedIn', 'true'); // Ավելացված է
+                localStorage.setItem('studentName', s);
+                window.location.href = "student_view.html";
             }
-        }
+        });
 
         if (!studentFound) {
             error.style.display = 'block';
