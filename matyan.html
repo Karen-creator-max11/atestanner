@@ -183,7 +183,7 @@
         color: var(--primary);
     }
 
-    /* 🗔 ԱՌԱՆՁԻՆ ՊԱՏՈՒՀԱՆԻ (MODAL) ՍԹԱՅԼԵՐ */
+    /* 🗔 MODAL ՍԹԱՅԼԵՐ */
     .modal {
         display: none; 
         position: fixed; 
@@ -251,7 +251,6 @@
         border-radius: 4px;
     }
 
-    /* Ադմինի աղյուսակի սթայլեր */
     .admin-table-wrapper {
         margin-top: 20px;
         max-height: 250px;
@@ -291,7 +290,6 @@
     <div class="header-section">
         <h2>Ուսուցչի Մատյան</h2>
         <div class="action-buttons">
-            <!-- Ավելացվեց Կառավարման կոճակը Տպել կոճակի կողքին -->
             <button class="btn-ui" style="background: #9b59b6; color: white; border: none;" onclick="openAdminModal()">ԿԱՌԱՎԱՐՈՒՄ</button>
             <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
             <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
@@ -326,7 +324,7 @@
     </div>
 </div>
 
-<!-- 🗔 ԿԱՌԱՎԱՐՄԱՆ ԱՌԱՆՁԻՆ ՊԱՏՈՒՀԱՆ (MODAL POP-UP) -->
+<!-- 🗔 ԿԱՌԱՎԱՐՄԱՆ ԱՌԱՆՁԻՆ ՊԱՏՈՒՀԱՆ -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeAdminModal()">&times;</span>
@@ -334,14 +332,12 @@
         <hr>
         
         <div class="admin-sections">
-            <!-- Դասարան ավելացնել -->
             <div class="admin-box">
                 <h4>➕ Ավելացնել Դասարան</h4>
                 <input type="text" id="new-class-name" placeholder="Օրինակ՝ 10բ">
                 <button onclick="addNewClass()">Ավելացնել</button>
             </div>
 
-            <!-- Աշակերտ գրանցել -->
             <div class="admin-box">
                 <h4>➕ Գրանցել Նոր Աշակերտ</h4>
                 <input type="text" id="new-student-name" placeholder="Անուն">
@@ -354,8 +350,7 @@
             </div>
         </div>
 
-        <!-- 📋 ԳՐԱՆՑՎԱԾՆԵՐԻ ՑՈՒՑԱԿԸ ՊԱՏՈՒՀԱՆԻ ՄԵՋ -->
-        <h4 style="margin-top: 25px; margin-bottom: 5px;">📋 Գրանցված Աշակերտների Ցուցակ (Լոգիններով)</h4>
+        <h4 style="margin-top: 25px; margin-bottom: 5px;">📋 Գրանցված Աշակերտների Ցուցակ</h4>
         <div class="admin-table-wrapper">
             <table class="admin-table">
                 <thead>
@@ -366,16 +361,13 @@
                         <th>Գաղտնաբառ</th>
                     </tr>
                 </thead>
-                <tbody id="admin-students-table-body">
-                    <!-- Տվյալները կգեներացվեն JS-ով -->
-                </tbody>
+                <tbody id="admin-students-table-body"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    // Դուրս գալու ֆունկցիա
     function logout() {
         localStorage.removeItem("isLoggedIn");
         window.location.href = "index.html";
@@ -386,24 +378,29 @@
     let currentClass = '', currentView = '', allData = []; 
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     
-    // Հիմնական տվյալների օբյեկտը
-    const studentsData = {
+    // 💡 ՈՒՂՂՎԱԾ ՏՐԱՄԱԲԱՆՈՒԹՅՈՒՆ: Ստուգում ենք՝ ունենք արդեն պահպանված բազա LocalStorage-ում, թե ոչ
+    const initialDefaultData = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
 
-    // Պատուհանը բացելու ֆունկցիա
+    // Եթե LocalStorage-ում տվյալ չկա, տեղադրում ենք սկզբնականը, հակառակ դեպքում կարդում ենք եղածը
+    if (!localStorage.getItem("journalStudentsData")) {
+        localStorage.setItem("journalStudentsData", JSON.stringify(initialDefaultData));
+    }
+    
+    // Սա մեր հիմնական օբյեկտն է, որը միշտ թարմ տվյալներ կունենա
+    let studentsData = JSON.parse(localStorage.getItem("journalStudentsData"));
+
     function openAdminModal() {
         document.getElementById('adminModal').style.display = "block";
-        renderAdminStudentsList(); // Թարմացնում ենք աղյուսակը բացվելիս
+        renderAdminStudentsList(); 
     }
 
-    // Պատուհանը փակելու ֆունկցիա
     function closeAdminModal() {
         document.getElementById('adminModal').style.display = "none";
     }
 
-    // Փակել պատուհանը, եթե սեղմում են պատուհանից դուրս տարածքի վրա
     window.onclick = function(event) {
         const modal = document.getElementById('adminModal');
         if (event.target == modal) {
@@ -411,17 +408,13 @@
         }
     }
 
-    // Ֆունկցիա՝ գեներացնում է լոգինը Անունից և Ազգանունից
     function generateUsername(fullName) {
-        // Բաժանում ենք ազգանունն ու անունը իրարից (ենթադրում ենք «Ազգանուն Անուն» ֆորմատը)
         const parts = fullName.split(' ');
         const surname = parts[0] || 'User';
         const name = parts[1] || 'Student';
-        // Վերադարձնում ենք Anun_Azganun ֆորմատով
         return `${name}_${surname}`;
     }
 
-    // ՊԱՏՈՒՀԱՆԻ ՄԵՋԻ ԱՂՅՈՒՍԱԿԻ ԹԱՐՄԱՑՈՒՄԸ (Նախկին + Նոր աշակերտներ)
     function renderAdminStudentsList() {
         const tbody = document.getElementById('admin-students-table-body');
         tbody.innerHTML = '';
@@ -442,7 +435,6 @@
         });
     }
 
-    // Ֆունկցիա՝ դասարանների կոճակները և ընտրացանկերը ԲՈԼՈՐ տեղերում թարմացնելու համար
     function updateClassUI() {
         const btnGroup = document.getElementById('class-buttons-group');
         const selectMenu = document.getElementById('new-student-class');
@@ -465,7 +457,7 @@
         });
     }
 
-    // ՆՈՐ ԴԱՍԱՐԱՆ ԱՎԵԼԱՑՆԵԼՈՒ ՖՈՒՆԿՑԻԱ
+    // ՆՈՐ ԴԱՍԱՐԱՆ ԱՎԵԼԱՑՆԵԼ (Ուղղված է `localStorage`-ով)
     function addNewClass() {
         const classInput = document.getElementById('new-class-name');
         const className = classInput.value.trim();
@@ -480,14 +472,17 @@
         }
 
         studentsData[className] = [];
-        classInput.value = '';
         
+        // 💾 Պահպանում ենք թարմացված օբյեկտը LocalStorage-ում
+        localStorage.setItem("journalStudentsData", JSON.stringify(studentsData));
+
+        classInput.value = '';
         updateClassUI();
-        renderAdminStudentsList(); // Թարմացնում ենք աղյուսակը պատուհանում
-        alert(`${className} դասարանը հաջողությամբ ավելացվեց բոլոր տեղերում:`);
+        renderAdminStudentsList(); 
+        alert(`${className} դասարանը հաջողությամբ ավելացվեց և պահպանվեց հիշողության մեջ:`);
     }
 
-    // ՆՈՐ ԱՇԱԿԵՐՏ ԳՐԱՆՑԵԼՈՒ ՖՈՒՆԿՑԻԱ
+    // ՆՈՐ ԱՇԱԿԵՐՏ ԳՐԱՆՑԵԼ (Ուղղված է `localStorage`-ով)
     function addNewStudent() {
         const nameInput = document.getElementById('new-student-name');
         const surnameInput = document.getElementById('new-student-surname');
@@ -502,7 +497,6 @@
             return;
         }
 
-        // Սարքում ենք ճիշտ ֆորմատի Անուն Ազգանունը (Ազգանուն Անուն տարբերակով)
         const fullName = `${surname.charAt(0).toUpperCase() + surname.slice(1)} ${name.charAt(0).toUpperCase() + name.slice(1)}`;
 
         if (studentsData[selectedClass].includes(fullName)) {
@@ -511,7 +505,10 @@
         }
 
         studentsData[selectedClass].push(fullName);
-        studentsData[selectedClass].sort(); // Այբբենական դասավորում
+        studentsData[selectedClass].sort(); 
+
+        // 💾 Պահպանում ենք թարմացված օբյեկտը LocalStorage-ում
+        localStorage.setItem("journalStudentsData", JSON.stringify(studentsData));
 
         const username = `${name.charAt(0).toUpperCase() + name.slice(1)}_${surname.charAt(0).toUpperCase() + surname.slice(1)}`;
 
@@ -523,7 +520,7 @@
         surnameInput.value = '';
         classSelect.value = '';
 
-        renderAdminStudentsList(); // Անմիջապես թարմացնում ենք ադմինի աղյուսակը
+        renderAdminStudentsList(); 
 
         if (currentClass === selectedClass && currentView !== '') {
             renderTable();
@@ -618,7 +615,7 @@
         saveBtn.disabled = false;
     }
 
-    // Առաջին անգամ էջը միացնելիս ստեղծում ենք սկզբնական կոճակները
+    // Բեռնում ենք կոճակները
     updateClassUI();
 </script>
 </body>
