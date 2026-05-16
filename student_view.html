@@ -1,161 +1,321 @@
 <!DOCTYPE html>
+
 <html lang="hy">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ԱՏԵՍՏԱՏ - Աշակերտի Անձնական Էջ</title>
+
     <style>
+
         :root {
+
             --danger: #e74c3c;   /* 1-4 */
+
             --warning: #f39c12;  /* 5-6 */
+
             --info: #3498db;     /* 7-8 */
+
             --success: #2ecc71;  /* 9-10 */
+
             --none: #f1f1f1;
+
         }
+
+
 
         body { font-family: 'Sylfaen', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
+
         .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-        
+
+       
+
         .header-title { font-size: 36px; font-weight: bold; color: #2c3e50; letter-spacing: 5px; border-bottom: 4px solid #2c3e50; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
-        
-        .student-info { 
-            margin-bottom: 25px; padding: 15px 25px; background: #eef2f3; border-radius: 12px; 
+
+       
+
+        .student-info {
+
+            margin-bottom: 25px; padding: 15px 25px; background: #eef2f3; border-radius: 12px;
+
             font-size: 18px; color: #34495e; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+
         }
+
         .class-badge { background: #34495e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
 
+
+
         .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; position: relative; min-height: 200px; }
+
         table { width: 100%; border-collapse: collapse; background: white; }
+
         th, td { padding: 15px 10px; border-bottom: 1px solid #eee; text-align: center; }
+
         th { background-color: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; }
-        
+
+       
+
         .subject-name { text-align: left; font-weight: bold; color: #2c3e50; padding-left: 20px; min-width: 180px; }
 
+
+
         .mark-box {
-            width: 40px; height: 40px; margin: auto; display: flex; 
-            justify-content: center; align-items: center; border-radius: 8px; 
+
+            width: 40px; height: 40px; margin: auto; display: flex;
+
+            justify-content: center; align-items: center; border-radius: 8px;
+
             font-weight: bold; font-size: 16px; color: white; transition: 0.3s;
+
         }
 
+
+
         .m-danger { background-color: var(--danger); }
+
         .m-warning { background-color: var(--warning); }
+
         .m-info { background-color: var(--info); }
+
         .m-success { background-color: var(--success); }
+
         .m-none { background-color: var(--none); color: #999; }
+
+
 
         .annual-col { background-color: #fcfcfc; border-left: 2px solid #eee; }
 
-        .logout-btn { 
-            display: inline-block; margin-top: 30px; color: #e74c3c; text-decoration: none; 
+
+
+        .logout-btn {
+
+            display: inline-block; margin-top: 30px; color: #e74c3c; text-decoration: none;
+
             font-weight: bold; border: 2px solid #e74c3c; padding: 10px 25px; border-radius: 10px; transition: 0.3s;
+
         }
+
         .logout-btn:hover { background: #e74c3c; color: white; }
 
+
+
         #loading-overlay {
+
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
             background: rgba(255,255,255,0.8); display: flex; justify-content: center;
+
             align-items: center; font-weight: bold; color: var(--info);
+
         }
+
     </style>
+
 </head>
+
 <body>
 
+
+
 <div class="container">
+
     <div class="header-title">ԱՏԵՍՏԱՏ</div>
-    
+
+   
+
     <div class="student-info">
+
         <span id="stName">Աշակերտ՝ -</span>
+
         <span class="class-badge" id="stClass">Դասարան՝ Բեռնվում է...</span>
+
     </div>
+
+
 
     <div class="table-wrapper">
+
         <div id="loading-overlay">Բեռնվում է...</div>
+
         <table>
+
             <thead>
+
                 <tr>
+
                     <th class="subject-name">Առարկա</th>
+
                     <th>1-ին Կիսամյակ</th>
+
                     <th>2-րդ Կիսամյակ</th>
+
                     <th class="annual-col">Տարեկան</th>
+
                 </tr>
+
             </thead>
+
             <tbody id="marksBody"></tbody>
+
         </table>
+
     </div>
 
+
+
     <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
+
 </div>
 
+
+
 <script>
+
     // Վերջնական թարմացված հղումը
+
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";
-    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
+
+    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն", "Մասնագիտացված մաթեմատիկա"];
+
+
 
     const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
+
     document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
 
+
+
     function getMarkHTML(mark) {
+
         if (!mark || mark === "-" || mark === "") return `<div class="mark-box m-none">-</div>`;
+
         const n = parseInt(mark);
+
         let cls = "m-none";
+
         if (n >= 1 && n <= 4) cls = "m-danger";
+
         else if (n >= 5 && n <= 6) cls = "m-warning";
+
         else if (n >= 7 && n <= 8) cls = "m-info";
+
         else if (n >= 9 && n <= 10) cls = "m-success";
+
         return `<div class="mark-box ${cls}">${n}</div>`;
+
     }
+
+
 
     async function loadDataFromSheets() {
+
         try {
+
             const response = await fetch(SCRIPT_URL);
-            const rows = await response.json(); 
-            
+
+            const rows = await response.json();
+
+           
+
             const tbody = document.getElementById('marksBody');
+
             tbody.innerHTML = '';
+
             document.getElementById('loading-overlay').style.display = 'none';
 
+
+
             // Գտնում ենք տվյալ աշակերտի առաջին իսկ տողը՝ դասարանը իմանալու համար
+
             const studentRow = rows.find(r => r[0] === currentStudent);
+
             if (studentRow && studentRow[4]) {
+
                 // Եթե աղյուսակի 5-րդ սյունակում (r[4]) կա դասարանը, տեղադրում ենք այն
+
                 document.getElementById('stClass').innerText = "Դասարան՝ " + studentRow[4];
+
             } else {
+
                 document.getElementById('stClass').innerText = "Դասարան՝ -";
+
             }
 
+
+
             subjects.forEach(sub => {
+
                 // row[0] - Անուն, row[1] - Առարկա, row[2] - Գնահատական, row[3] - Կիսամյակ
+
                 const sem1Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "1");
+
                 const sem2Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "2");
 
+
+
                 const m1 = sem1Row ? sem1Row[2] : "-";
+
                 const m2 = sem2Row ? sem2Row[2] : "-";
-                
+
+               
+
                 let annual = "-";
+
                 // Հաշվարկում ենք տարեկանը միայն եթե երկու կիսամյակն էլ ունեն գնահատական
+
                 if (m1 !== "-" && m2 !== "-" && m1 !== "" && m2 !== "") {
+
                     annual = Math.round((parseInt(m1) + parseInt(m2)) / 2);
+
                 }
 
+
+
                 tbody.innerHTML += `
+
                     <tr>
+
                         <td class="subject-name">${sub}</td>
+
                         <td>${getMarkHTML(m1)}</td>
+
                         <td>${getMarkHTML(m2)}</td>
+
                         <td class="annual-col">${getMarkHTML(annual)}</td>
+
                     </tr>
+
                 `;
+
             });
+
         } catch (error) {
+
             console.error("Սխալ տվյալները բեռնելիս:", error);
+
             document.getElementById('loading-overlay').innerText = "Սխալ՝ կապի խափանում:";
+
             document.getElementById('loading-overlay').style.color = "red";
+
             document.getElementById('stClass').innerText = "Դասարան՝ Սխալ";
+
         }
+
     }
 
+
+
     window.onload = loadDataFromSheets;
+
 </script>
 
+
+
 </body>
+
 </html>
