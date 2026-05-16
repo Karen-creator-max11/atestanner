@@ -65,7 +65,7 @@
     
     <div class="student-info">
         <span id="stName">Աշակերտ՝ -</span>
-        <span class="class-badge" id="stClass">Դասարան՝ -</span>
+        <span class="class-badge" id="stClass">Դասարան՝ Բեռնվում է...</span>
     </div>
 
     <div class="table-wrapper">
@@ -88,12 +88,11 @@
 
 <script>
     // Վերջնական թարմացված հղումը
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
-    const students11a = ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMApRjfGcpTiNSvfYMztYvg-ZaJeumX1JCj4ZPoONdil5iL_xs7/exec";
+    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
 
     const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
     document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
-    document.getElementById('stClass').innerText = "Դասարան՝ " + (students11a.includes(currentStudent) ? "11ա" : "12ա");
 
     function getMarkHTML(mark) {
         if (!mark || mark === "-" || mark === "") return `<div class="mark-box m-none">-</div>`;
@@ -115,8 +114,16 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMAp
             tbody.innerHTML = '';
             document.getElementById('loading-overlay').style.display = 'none';
 
+            // Գտնում ենք տվյալ աշակերտի առաջին իսկ տողը՝ դասարանը իմանալու համար
+            const studentRow = rows.find(r => r[0] === currentStudent);
+            if (studentRow && studentRow[4]) {
+                // Եթե աղյուսակի 5-րդ սյունակում (r[4]) կա դասարանը, տեղադրում ենք այն
+                document.getElementById('stClass').innerText = "Դասարան՝ " + studentRow[4];
+            } else {
+                document.getElementById('stClass').innerText = "Դասարան՝ -";
+            }
+
             subjects.forEach(sub => {
-                // Փնտրում ենք տվյալները հենց այս աշակերտի համար
                 // row[0] - Անուն, row[1] - Առարկա, row[2] - Գնահատական, row[3] - Կիսամյակ
                 const sem1Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "1");
                 const sem2Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "2");
@@ -143,6 +150,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe-EM5zbd5ZbDoUAMAp
             console.error("Սխալ տվյալները բեռնելիս:", error);
             document.getElementById('loading-overlay').innerText = "Սխալ՝ կապի խափանում:";
             document.getElementById('loading-overlay').style.color = "red";
+            document.getElementById('stClass').innerText = "Դասարան՝ Սխալ";
         }
     }
 
