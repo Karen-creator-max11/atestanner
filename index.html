@@ -19,78 +19,106 @@
 
 <div class="login-container">
     <h2>Մուտք Համակարգ</h2>
-    <input type="text" id="username" placeholder="Օգտանուն">
+    <input type="text" id="username" placeholder="Օգտանուն (Azganun_Anun_dasaran)">
     <input type="password" id="password" placeholder="Գաղտնաբառ">
     <button onclick="handleLogin()">Մուտք գործել</button>
     <div id="error-msg" class="error">Սխալ օգտանուն կամ գաղտնաբառ</div>
     
     <div class="hint">
         * Ուսուցիչների համար՝ հատուկ ID<br>
-        * Աշակերտների համար՝ Անուն կամ Անուն_ԱզգանվանԱռաջինՏառ
+        * Աշակերտների համար՝ Azganun_Anun_dasaran (օրինակ՝ Abgaryan_Tatevik_11a)
     </div>
 </div>
 
 <script>
     const TEACHER_USER = "teacher2024";
-    const TEACHER_PASS_ENCODED = "ZHByb2MxMjM="; 
-    const STUDENT_PASS_ENCODED = "MTIzNDU=";    
+    const TEACHER_PASS_ENCODED = "ZHByb2MxMjM="; // dproc123
+    const STUDENT_PASS_ENCODED = "MTIzNDU=";    // 12345
 
-    const students = [
-        "Աբգարյան Տաթևիկ", "Աղեկյան Մանվել", "Արամյան Արսեն", "Արզումանյան Անժելա", "Բաբայան Արյուսակ",
-        "Բաղդասարյան Արյուսակ", "Բունիաթյան Գոհար", "Գասպարյան Արսեն", "Գյուլումյան Հասմիկ", "Գրիգորյան Աննա",
-        "Զաքարյան Աշխեն", "Խալաթյան Աշխեն", "Կարապետյան Ալիսա", "Հովհաննիսյան Մելինե", "Մեսրոպյան Սոնա",
-        "Մուրադյան Արսեն", "Ներսիսյան Մարինա", "Նիկողոսյան Մարգարիտ", "Շահբազյան Լիլիա", "Սուքիսյան Նարինե",
-        "Աբելյան Զարուհի", "Աբրահամյան Լիլիա", "Գյուլումյան Վահե", "Դավթյան Կարեն", "Դիլանյան Աննա",
-        "Զալյան Արման", "Թադևոսյան Սյուզան", "Իգիթյան Սոնա", "Լևոնյան Արթեմ", "Կարապետյան Լիլիթ",
-        "Կիրակոսյան Ռոզա", "Կիրակոսյան Ալիսա", "Հակոբջանյան Անի", "Մամիկոնյան Ռուբեն", "Նահապետյան Գայանե",
-        "Սահակյան Կարեն", "Վանյան Արյուսակ", "Փայտյան Հրայր", "Քյարունյան Կարեն", "Օհաննիսյան Հակոբ"
-    ];
+    // Աշակերտների տվյալները խմբավորված ըստ դասարանների
+    const studentsData = {
+        '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
+        '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ'],
+        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի']
+    };
+
+    // Հայերեն տառերը լատինատառի փոխարինելու ֆունկցիա (Translit)
+    function transliterate(text) {
+        const armToLat = {
+            'Ա': 'A', 'ա': 'a', 'Բ': 'B', 'բ': 'b', 'Գ': 'G', 'գ': 'g', 'Դ': 'D', 'դ': 'd',
+            'Ե': 'E', 'ե': 'e', 'Զ': 'Z', 'զ': 'z', 'Է': 'E', 'է': 'e', 'Ը': 'E', 'ը': 'e',
+            'Թ': 'T', 'թ': 't', 'Ժ': 'Zh', 'ժ': 'zh', 'Ի': 'I', 'ի': 'i', 'Լ': 'L', 'լ': 'l',
+            'Խ': 'Kh', 'խ': 'kh', 'Ծ': 'Ts', 'ծ': 'ts', 'Կ': 'K', 'կ': 'k', 'Հ': 'H', 'հ': 'h',
+            'Ձ': 'Dz', 'ձ': 'dz', 'Ղ': 'Gh', 'ղ': 'gh', 'Ճ': 'Ch', 'ճ': 'ch', 'Մ': 'M', 'մ': 'm',
+            'Յ': 'Y', 'յ': 'y', 'Ն': 'N', 'ն': 'n', 'Շ': 'Sh', 'շ': 'sh', 'Ո': 'O', 'ո': 'o',
+            'Չ': 'Ch', 'չ': 'ch', 'Պ': 'P', 'պ': 'p', 'Ջ': 'J', 'ջ': 'j', 'Ռ': 'R', 'ռ': 'r',
+            'Ս': 'S', 'ս': 's', 'Վ': 'V', 'վ': 'v', 'Տ': 'T', 'տ': 't', 'Ր': 'R', 'ր': 'r',
+            'Ց': 'Ts', 'ց': 'ts', 'Ու': 'U', 'ու': 'u', 'Փ': 'P', 'փ': 'p', 'Ք': 'Q', 'ք': 'q',
+            'Եվ': 'Ev', 'եվ': 'ev', 'Օ': 'O', 'օ': 'o', 'Ֆ': 'F', 'ֆ': 'f'
+        };
+        
+        return text.split('').map(char => armToLat[char] || char).join('');
+    }
+
+    // Դասարանի անունը մաքրող ֆունկցիա (օրինակ՝ '11ա' -> '11a')
+    function cleanClassName(className) {
+        return className.replace('ա', 'a').replace('դ', 'd');
+    }
 
     function handleLogin() {
-        const user = document.getElementById('username').value.trim();
+        const user = document.getElementById('username').value.trim().toLowerCase();
         const pass = document.getElementById('password').value;
         const error = document.getElementById('error-msg');
 
-        // Մաքրում ենք հին տվյալները
+        error.style.display = 'none';
+
         sessionStorage.removeItem('isLoggedIn');
         localStorage.removeItem('isLoggedIn');
 
         const encodedPass = btoa(pass);
 
         // 1. Ուսուցչի մուտք
-        if (user === TEACHER_USER && encodedPass === TEACHER_PASS_ENCODED) {
+        if (user === TEACHER_USER.toLowerCase() && encodedPass === TEACHER_PASS_ENCODED) {
             sessionStorage.setItem('isLoggedIn', 'teacher');
-            localStorage.setItem('isLoggedIn', 'true'); // Սա մատյանի էջի համար է
+            localStorage.setItem('isLoggedIn', 'true');
             window.location.href = "matyan.html";
             return;
         }
 
-        // 2. Աշակերտների մուտք
-        let nameCounts = {};
-        students.forEach(s => {
-            let firstName = s.split(' ')[1];
-            nameCounts[firstName] = (nameCounts[firstName] || 0) + 1;
-        });
-
+        // 2. Աշակերտների մուտքի ստուգում
         let studentFound = false;
-        students.forEach(s => {
-            const parts = s.split(' ');
-            const lastName = parts[0];
-            const firstName = parts[1];
-            
-            let finalUsername = firstName;
-            if (nameCounts[firstName] > 1) {
-                finalUsername = firstName + "_" + lastName[0];
-            }
 
-            if (user === finalUsername && encodedPass === STUDENT_PASS_ENCODED) {
-                studentFound = true;
-                sessionStorage.setItem('isLoggedIn', 'student');
-                localStorage.setItem('isLoggedIn', 'true'); // Ավելացված է
-                localStorage.setItem('studentName', s);
-                window.location.href = "student_view.html";
+        // Պտտվում ենք դասարանների վրայով
+        for (let className in studentsData) {
+            const classStudents = studentsData[className];
+            const safeClassName = cleanClassName(className); // '11ա' -> '11a'
+
+            // Պտտվում ենք տվյալ դասարանի աշակերտների վրայով
+            for (let i = 0; i < classStudents.length; i++) {
+                const fullName = classStudents[i];
+                const parts = fullName.split(' ');
+                const lastName = parts[0];
+                const firstName = parts[1];
+
+                // Սարքում ենք լատինատառ տարբերակները
+                const latLastName = transliterate(lastName);
+                const latFirstName = transliterate(firstName);
+
+                // Գեներացնում ենք սպասվող լոգինը՝ Azganun_Anun_dasaran (դարձնում ենք փոքրատառ)
+                const generatedUsername = `${latLastName}_${latFirstName}_${safeClassName}`.toLowerCase();
+
+                if (user === generatedUsername && encodedPass === STUDENT_PASS_ENCODED) {
+                    studentFound = true;
+                    sessionStorage.setItem('isLoggedIn', 'student');
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('studentName', fullName); // Պահում է հայատառ անունը
+                    localStorage.setItem('studentClass', className); // Պահում է դասարանը
+                    window.location.href = "student_view.html";
+                    break;
+                }
             }
-        });
+            if (studentFound) break;
+        }
 
         if (!studentFound) {
             error.style.display = 'block';
