@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ուսուցչի Մատյան</title>
     <style>
+        
     :root { 
         --primary: #4a90e2; 
         --bg: #f0f4f8; 
@@ -49,6 +50,11 @@
     }
 
     h2 { font-size: 18px; color: var(--primary); margin: 0; }
+
+    /* Տպվող վերնագրի թաքցված բլոկը սովորական էկրանին */
+    .print-header {
+        display: none;
+    }
 
     .selector-box { 
         display: flex; 
@@ -179,23 +185,127 @@
         color: var(--primary);
     }
 
+    /* ------------------------------------------------------------- */
+    /* ԹԱՐՄԱՑՎԱԾ ՏՊԵԼՈՒ ԿԱՐԳԱՎՈՐՈՒՄՆԵՐ (PRINT STYLES) */
+    /* ------------------------------------------------------------- */
     @media print {
-        .selector-box, .action-buttons, .logout-btn, #loading-overlay {
-            display: none !important;
+        @page {
+            size: landscape; 
+            margin: 8mm; 
         }
-        body { background-color: white; padding: 0; }
-        .container { box-shadow: none; padding: 0; }
-        .table-wrapper { overflow: visible !important; border: none; }
-        table { min-width: 100% !important; border: 1px solid black; }
-        th, td { border: 1px solid black !important; }
-        .student-name { position: static !important; border-right: 1px solid black !important; }
-        input { border: none !important; background: transparent !important; }
+        
+        .selector-box, .action-buttons, .logout-btn, #loading-overlay, .header-section h2 {
+            display: none !important; 
+        }
+        
+        .print-header {
+            display: block !important;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: black;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+
+        body { 
+            background: white !important; 
+            color: black !important;
+            padding: 0; 
+            margin: 0;
+        }
+        
+        .container { 
+            box-shadow: none !important; 
+            padding: 0 !important; 
+            background: transparent !important;
+        }
+        
+        .table-wrapper { 
+            overflow: visible !important; 
+            border: none !important; 
+        }
+        
+        table { 
+            width: max-content !important; 
+            min-width: 100% !important; 
+            border-collapse: collapse !important;
+            table-layout: auto !important;
+        }
+        
+        th, td { 
+            border: 1px solid #000 !important; 
+            padding: 5px 3px !important;
+            color: black !important;
+            font-size: 11px !important;
+        }
+
+        /* ՈՒՂՂՎԱԾ Է․ Համարների սյունը տպելիս սեղմում և փոքրացնում ենք */
+        th:first-child, td:first-child {
+            width: 25px !important;
+            max-width: 25px !important;
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+            text-align: center !important;
+        }
+
+        th:not(.student-name):not(:first-child) {
+            writing-mode: vertical-rl !important;
+            transform: rotate(180deg) !important;
+            white-space: nowrap !important;
+            vertical-align: middle !important;
+            text-align: left !important;
+            padding: 10px 4px !important;
+        }
+
+        th:not(.student-name):not(:first-child), 
+        td:not(.student-name):not(:first-child) {
+            width: 32px !important;
+            max-width: 32px !important;
+        }
+
+        thead tr {
+            height: 120px !important;
+        }
+        
+        th {
+            background: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact;
+        }
+        
+        .student-name { 
+            position: static !important; 
+            background: transparent !important;
+            border-right: 1px solid #000 !important; 
+            font-size: 12px !important;
+            width: 180px !important;
+            min-width: 180px !important;
+        }
+        
+        .mark-input { 
+            border: 1px solid #000 !important; 
+            background: white !important; 
+            display: inline-block !important;
+            width: 26px !important;
+            height: 22px !important;
+            font-size: 13px !important;
+            color: black !important;
+            box-shadow: none !important;
+            border-radius: 0px !important;
+            text-align: center !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
     }
 </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="print-header" id="print-title">Ուսուցչի Մատյան</div>
+
     <div class="header-section">
         <h2>Ուսուցչի Մատյան</h2>
         <div class="action-buttons">
@@ -236,7 +346,6 @@
 </div>
 
 <script>
-    // Դուրս գալու ֆունկցիա
     function logout() {
         localStorage.removeItem("isLoggedIn");
         window.location.href = "index.html";
@@ -247,10 +356,10 @@
     let currentClass = '', currentView = '', allData = []; 
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     const studentsData = {
-    '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
-    '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ'],
-    '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի']
-};
+        '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
+        '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ'],
+        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի']
+    };
 
     async function refreshData() {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -267,14 +376,25 @@
         btn.classList.add('active');
         document.getElementById('semester-section').style.display = 'flex';
         document.getElementById('marks-table-container').style.display = 'none';
+        updatePrintTitle();
     }
 
     async function selectType(type, btn) {
         currentView = type;
         document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        updatePrintTitle();
         await refreshData();
         renderTable();
+    }
+
+    function updatePrintTitle() {
+        let viewText = "";
+        if (currentView === 1) viewText = "1-ին Կիսամյակ";
+        else if (currentView === 2) viewText = "2-րդ Կիսամյակ";
+        else if (currentView === 'annual') viewText = "Տարեկան";
+
+        document.getElementById('print-title').innerText = `Ուսուցչի Մատյան | Դասարան՝ ${currentClass} | ${viewText}`;
     }
 
     function renderTable() {
