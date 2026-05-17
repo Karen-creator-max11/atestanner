@@ -11,295 +11,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ուսուցչի Մատյան</title>
     <style>
-        
-    :root { 
-        --primary: #4a90e2; 
-        --bg: #f0f4f8; 
-        --text: #2c3e50; 
-        --success: #2ecc71; 
-        --border: #dee2e6; 
-        --annual-color: #9b59b6; 
-    }
-
-    body { 
-        font-family: 'Sylfaen', Tahoma, Geneva, Verdana, sans-serif; 
-        background-color: var(--bg); 
-        margin: 0; 
-        padding: 10px; 
-        color: var(--text); 
-    }
-
-    .container { 
-        max-width: 100%; 
-        margin: auto; 
-        background: white; 
-        padding: 15px; 
-        border-radius: 15px; 
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
-    }
-
-    .header-section { 
-        display: flex; 
-        flex-wrap: wrap; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 20px; 
-        gap: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-    }
-
-    h2 { font-size: 18px; color: var(--primary); margin: 0; }
-
-    /* Տպվող վերնագրի թաքցված բլոկը սովորական էկրանին */
-    .print-header {
-        display: none;
-    }
-
-    .selector-box { 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        gap: 12px; 
-        margin-bottom: 20px; 
-    }
-
-    .btn-group { 
-        display: flex; 
-        flex-wrap: wrap; 
-        justify-content: center; 
-        gap: 8px; 
-    }
-
-    .btn { 
-        padding: 8px 16px; 
-        font-size: 13px; 
-        cursor: pointer; 
-        border: 2px solid var(--primary); 
-        border-radius: 10px; 
-        background: white; 
-        color: var(--primary); 
-        font-weight: bold; 
-        transition: 0.2s;
-    }
-
-    .btn.active { background: var(--primary); color: white; }
-
-    .table-wrapper { 
-        overflow-x: auto; 
-        border-radius: 12px; 
-        border: 1px solid var(--border); 
-        position: relative;
-        -webkit-overflow-scrolling: touch; 
-    }
-
-    table { 
-        width: 100%; 
-        min-width: 900px; 
-        border-collapse: collapse; 
-        background: white;
-    }
-
-    th { 
-        background: #f8f9fa; 
-        padding: 12px 5px; 
-        font-size: 10px; 
-        border-bottom: 2px solid var(--border); 
-        color: #7f8c8d;
-        text-transform: uppercase;
-    }
-
-    td { 
-        padding: 8px 5px; 
-        border-bottom: 1px solid #f1f1f1; 
-        text-align: center; 
-    }
-
-    .student-name { 
-        text-align: left; 
-        padding-left: 15px; 
-        font-weight: 600; 
-        font-size: 14px;
-        position: sticky; 
-        left: 0; 
-        background: white; 
-        z-index: 5;
-        border-right: 2px solid var(--border);
-        min-width: 180px;
-    }
-
-    input[type="number"] { 
-        font-family: sylfaen;
-        width: 40px; 
-        height: 32px; 
-        border: 1px solid #ddd; 
-        border-radius: 6px; 
-        text-align: center; 
-        font-weight: bold; 
-        font-size: 16px;
-        outline: none;
-        -moz-appearance: textfield;
-    }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    .btn-ui { 
-        padding: 8px 15px; 
-        border-radius: 8px; 
-        font-size: 12px; 
-        font-weight: bold; 
-        cursor: pointer; 
-        text-decoration: none; 
-        display: inline-block;
-        transition: 0.3s;
-    }
-
-    .save-btn-top { 
-        background: var(--success); 
-        color: white; 
-        border: none; 
-        box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
-    }
-
-    .save-btn-top:active { transform: scale(0.95); }
-
-    .logout-btn { 
-        color: #e74c3c; 
-        border: 1px solid #e74c3c; 
-        background: white; 
-    }
-
-    #loading-overlay {
-        display: none;
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255,255,255,0.8);
-        z-index: 10;
-        justify-content: center;
-        align-items: center;
-        font-weight: bold;
-        color: var(--primary);
-    }
-
-    /* ------------------------------------------------------------- */
-    /* ԹԱՐՄԱՑՎԱԾ ՏՊԵԼՈՒ ԿԱՐԳԱՎՈՐՈՒՄՆԵՐ (PRINT STYLES) */
-    /* ------------------------------------------------------------- */
-    @media print {
-        @page {
-            size: landscape; 
-            margin: 8mm; 
-        }
-        
-        .selector-box, .action-buttons, .logout-btn, #loading-overlay, .header-section h2 {
-            display: none !important; 
-        }
-        
-        .print-header {
-            display: block !important;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: black;
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
+        :root { 
+            --primary: #4a90e2; 
+            --bg: #f0f4f8; 
+            --text: #2c3e50; 
+            --success: #2ecc71; 
+            --border: #dee2e6; 
+            --annual-color: #9b59b6; 
         }
 
         body { 
-            background: white !important; 
-            color: black !important;
-            padding: 0; 
+            font-family: 'Sylfaen', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            padding: 10px; 
+            color: var(--text); 
+        }
+
+        .container { 
+            max-width: 100%; 
+            margin: auto; 
+            background: white; 
+            padding: 15px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+        }
+
+        .header-section { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h2 { font-size: 18px; color: var(--primary); margin: 0; }
+
+        .print-header { display: none; }
+
+        .selector-box { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 20px; 
+        }
+
+        .btn-group { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+
+        .btn { 
+            padding: 8px 16px; 
+            font-size: 13px; 
+            cursor: pointer; 
+            border: 2px solid var(--primary); 
+            border-radius: 10px; 
+            background: white; 
+            color: var(--primary); 
+            font-weight: bold; 
+            transition: 0.2s;
+        }
+
+        .btn.active { background: var(--primary); color: white; }
+
+        .table-wrapper { 
+            overflow-x: auto; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            position: relative;
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        table { 
+            width: 100%; 
+            min-width: 900px; 
+            border-collapse: collapse; 
+            background: white;
+        }
+
+        th { 
+            background: #f8f9fa; 
+            padding: 12px 5px; 
+            font-size: 10px; 
+            border-bottom: 2px solid var(--border); 
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        td { 
+            padding: 8px 5px; 
+            border-bottom: 1px solid #f1f1f1; 
+            text-align: center; 
+        }
+
+        .student-name { 
+            text-align: left; 
+            padding-left: 15px; 
+            font-weight: 600; 
+            font-size: 14px;
+            position: sticky; 
+            left: 0; 
+            background: white; 
+            z-index: 5;
+            border-right: 2px solid var(--border);
+            min-width: 180px;
+        }
+
+        input[type="number"] { 
+            font-family: sylfaen;
+            width: 40px; 
+            height: 32px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 16px;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
             margin: 0;
         }
-        
-        .container { 
-            box-shadow: none !important; 
-            padding: 0 !important; 
-            background: transparent !important;
-        }
-        
-        .table-wrapper { 
-            overflow: visible !important; 
-            border: none !important; 
-        }
-        
-        table { 
-            width: max-content !important; 
-            min-width: 100% !important; 
-            border-collapse: collapse !important;
-            table-layout: auto !important;
-        }
-        
-        th, td { 
-            border: 1px solid #000 !important; 
-            padding: 5px 3px !important;
-            color: black !important;
-            font-size: 11px !important;
+
+        .btn-ui { 
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-decoration: none; 
+            display: inline-block;
+            transition: 0.3s;
         }
 
-        /* ՈՒՂՂՎԱԾ Է․ Համարների սյունը տպելիս սեղմում և փոքրացնում ենք */
-        th:first-child, td:first-child {
-            width: 25px !important;
-            max-width: 25px !important;
-            padding-left: 2px !important;
-            padding-right: 2px !important;
-            text-align: center !important;
+        .save-btn-top { 
+            background: var(--success); 
+            color: white; 
+            border: none; 
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
         }
 
-        th:not(.student-name):not(:first-child) {
-            writing-mode: vertical-rl !important;
-            transform: rotate(180deg) !important;
-            white-space: nowrap !important;
-            vertical-align: middle !important;
-            text-align: left !important;
-            padding: 10px 4px !important;
+        .save-btn-top:disabled { background: #95a5a6; cursor: not-allowed; }
+
+        .logout-btn { 
+            color: #e74c3c; 
+            border: 1px solid #e74c3c; 
+            background: white; 
         }
 
-        th:not(.student-name):not(:first-child), 
-        td:not(.student-name):not(:first-child) {
-            width: 32px !important;
-            max-width: 32px !important;
+        #loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--primary);
         }
 
-        thead tr {
-            height: 120px !important;
+        @media print {
+            @page { size: landscape; margin: 8mm; }
+            .selector-box, .action-buttons, .logout-btn, #loading-overlay, .header-section h2 { display: none !important; }
+            .print-header { display: block !important; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 15px; color: black; border-bottom: 2px solid #000; padding-bottom: 5px; }
+            body { background: white !important; color: black !important; padding: 0; margin: 0; }
+            .container { box-shadow: none !important; padding: 0 !important; background: transparent !important; }
+            .table-wrapper { overflow: visible !important; border: none !important; }
+            table { width: max-content !important; min-width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; }
+            th, td { border: 1px solid #000 !important; padding: 5px 3px !important; color: black !important; font-size: 11px !important; }
+            th:first-child, td:first-child { width: 25px !important; max-width: 25px !important; text-align: center !important; }
+            th:not(.student-name):not(:first-child) { writing-mode: vertical-rl !important; transform: rotate(180deg) !important; white-space: nowrap !important; vertical-align: middle !important; text-align: left !important; padding: 10px 4px !important; }
+            th:not(.student-name):not(:first-child), td:not(.student-name):not(:first-child) { width: 32px !important; max-width: 32px !important; }
+            thead tr { height: 120px !important; }
+            th { background: #f0f0f0 !important; }
+            .student-name { position: static !important; background: transparent !important; border-right: 1px solid #000 !important; font-size: 12px !important; width: 180px !important; min-width: 180px !important; }
+            .mark-input { border: 1px solid #000 !important; background: white !important; display: inline-block !important; width: 26px !important; height: 22px !important; font-size: 13px !important; color: black !important; border-radius: 0px !important; text-align: center !important; }
         }
-        
-        th {
-            background: #f0f0f0 !important;
-            -webkit-print-color-adjust: exact; 
-            print-color-adjust: exact;
-        }
-        
-        .student-name { 
-            position: static !important; 
-            background: transparent !important;
-            border-right: 1px solid #000 !important; 
-            font-size: 12px !important;
-            width: 180px !important;
-            min-width: 180px !important;
-        }
-        
-        .mark-input { 
-            border: 1px solid #000 !important; 
-            background: white !important; 
-            display: inline-block !important;
-            width: 26px !important;
-            height: 22px !important;
-            font-size: 13px !important;
-            color: black !important;
-            box-shadow: none !important;
-            border-radius: 0px !important;
-            text-align: center !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-    }
-</style>
+    </style>
 </head>
 <body>
 
@@ -336,7 +235,7 @@
                     <tr>
                         <th>#</th><th class="student-name">Աշակերտ</th>
                         <th>Հանրահաշիվ</th><th>Երկրաչափ.</th><th>Ֆիզիկա</th><th>Հայոց Լեզու</th><th>Գրական.</th>
-                        <th>Պատմություն</th><th>Օտար Լեզու</th><th>Ռուսաց Լեզու</th><th>Ինֆորմատ.</th><th>Հասարակագ.</th><th>Մասնագ․ մաթեմ․</th>
+                        <th>Պատմություն</th><th>Օտար Լեզու</th><th>Ռուսաց Լեզու</th><th>Ինֆորմատ.</th><th>Հասարակագ.</th>
                     </tr>
                 </thead>
                 <tbody id="students-list"></tbody>
@@ -351,10 +250,10 @@
         window.location.href = "index.html";
     }
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyFehrtLvfWdKvwFvV78Qg0bmtjzsITF28x5JD3R7GTetRSICnRRW6fp8-s5ZaITM5/exec";
-    
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVX1qWXu42Vjb1fhylek8RtjgZHIUlVQdHvdUiQRD8t15ZBgI64pGkQvZl4UEm2-mm/exec";    
     let currentClass = '', currentView = '', allData = []; 
-    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն", "Մասնագիտացված մաթեմատիկա"];
+    
+    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
     const studentsData = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ'],
@@ -418,11 +317,62 @@
                     let annual = (m1 > 0 && m2 > 0) ? Math.round((m1 + m2) / 2) : "-";
                     cells += `<td><span style="font-weight:bold; color:#9b59b6;">${annual}</span></td>`;
                 } else {
-                    cells += `<td><input type="number" class="mark-input" data-student="${student}" data-subject="${sub}" 
+                    // Ավելացվել են data-row և data-col ատրիբուտներ սլաքների նավիգացիայի համար
+                    cells += `<td><input type="number" class="mark-input" data-row="${rIdx}" data-col="${cIdx}" data-student="${student}" data-subject="${sub}" 
                                data-original="${val}" value="${val}" min="1" max="10" oninput="validateMark(this)"></td>`;
                 }
             });
             list.innerHTML += `<tr><td>${rIdx+1}</td><td class="student-name">${student}</td>${cells}</tr>`;
+        });
+
+        // ՆԱՎԻԳԱՑԻԱ ՍԼԱՔՆԵՐՈՎ
+        setupArrowNavigation();
+    }
+
+    function setupArrowNavigation() {
+        const list = document.getElementById('students-list');
+        list.addEventListener('keydown', (e) => {
+            if (!e.target.classList.contains('mark-input')) return;
+
+            const currentRow = parseInt(e.target.dataset.row);
+            const currentCol = parseInt(e.target.dataset.col);
+            let targetRow = currentRow;
+            let targetCol = currentCol;
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    targetRow--;
+                    e.preventDefault(); // Էջի սքրոլը անջատելու համար
+                    break;
+                case 'ArrowDown':
+                    targetRow++;
+                    e.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                    targetCol--;
+                    break;
+                case 'ArrowRight':
+                    targetCol++;
+                    break;
+                default:
+                    return; // Թողնել, որ մնացած կոճակները (թվերը) սովորական աշխատեն
+            }
+
+            // Եթե տողից դուրս է գալիս հորիզոնական, անցնում է հաջորդ/նախորդ աշակերտին
+            if (targetCol < 0) {
+                targetRow--;
+                targetCol = subjects.length - 1;
+            } else if (targetCol >= subjects.length) {
+                targetRow++;
+                targetCol = 0;
+            }
+
+            // Գտնում ենք թիրախային input-ը
+            const nextInput = document.querySelector(`.mark-input[data-row="${targetRow}"][data-col="${targetCol}"]`);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.select(); // Ավտոմատ նշում է թիվը, որ հեշտ լինի ջնջել/փոխել
+            }
         });
     }
 
@@ -435,29 +385,58 @@
     async function saveAll() {
         const inputs = document.querySelectorAll('.mark-input');
         const saveBtn = document.getElementById('save-btn-ui');
-        saveBtn.innerText = "ՊԱՀՊԱՆՎՈՒՄ Է...";
-        saveBtn.disabled = true;
+        
+        let marksArray = [];
 
-        let promises = [];
         inputs.forEach(input => {
-            const newVal = input.value;
-            const oldVal = input.dataset.original;
+            const newVal = input.value.trim();
+            const oldVal = input.dataset.original.trim();
 
             if (newVal !== oldVal) {
-                const url = `${SCRIPT_URL}?name=${encodeURIComponent(input.dataset.student)}&subject=${encodeURIComponent(input.dataset.subject)}&grade=${encodeURIComponent(newVal)}&semester=${currentView}&class=${encodeURIComponent(currentClass)}`;
-                promises.push(fetch(url, { method: 'POST' }));
+                marksArray.push({
+                    student: input.dataset.student,
+                    subject: input.dataset.subject,
+                    grade: newVal,
+                    semester: currentView,
+                    class: currentClass
+                });
             }
         });
 
+        if (marksArray.length === 0) {
+            alert("Ոչ մի փոփոխություն չի կատարվել։");
+            return;
+        }
+
+        saveBtn.innerText = "ՊԱՀՊԱՆՎՈՒՄ Է...";
+        saveBtn.disabled = true;
+
         try {
-            await Promise.all(promises);
-            alert("Պահպանվեց։");
-            await refreshData();
-            renderTable();
-        } catch (e) { alert("Կապի սխալ:"); }
-        
-        saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
-        saveBtn.disabled = false;
+            const params = new URLSearchParams();
+            params.append('data', JSON.stringify({ marks: marksArray }));
+
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString()
+            });
+
+            alert("Գնահատականները հաջողությամբ պահպանվեցին։");
+            
+            setTimeout(async () => {
+                await refreshData();
+                renderTable();
+                saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
+                saveBtn.disabled = false;
+            }, 1500);
+
+        } catch (e) { 
+            alert("Գնահատականները պահպանվեցին, թարմացրեք էջը։"); 
+            saveBtn.innerText = "ՊԱՀՊԱՆԵԼ";
+            saveBtn.disabled = false;
+        }
     }
 </script>
 </body>
