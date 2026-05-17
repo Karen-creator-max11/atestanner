@@ -5,186 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ԱՏԵՍՏԱՏ - Աշակերտի Անձնական Էջ</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f8fafc; 
-            margin: 0; 
-            padding: 20px; 
-            color: #334155;
+        :root {
+            --danger: #e74c3c;   /* 1-4 */
+            --warning: #f39c12;  /* 5-6 */
+            --info: #3498db;     /* 7-8 */
+            --success: #2ecc71;  /* 9-10 */
+            --none: #f1f1f1;
         }
+
+        body { font-family: 'Sylfaen', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
         
-        .container { 
-            max-width: 900px; 
-            margin: auto; 
-            background: white; 
-            padding: 35px; 
-            border-radius: 16px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-        }
-        
-        .header-title { 
-            font-size: 28px; 
-            font-weight: 700; 
-            color: #1e293b; 
-            text-align: center;
-            letter-spacing: 3px; 
-            margin-bottom: 30px;
-        }
+        .header-title { font-size: 36px; font-weight: bold; color: #2c3e50; letter-spacing: 5px; border-bottom: 4px solid #2c3e50; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
         
         .student-info { 
-            margin-bottom: 30px; 
-            padding: 16px 24px; 
-            background: #f1f5f9; 
-            border-radius: 12px; 
-            font-size: 16px; 
-            color: #475569; 
-            font-weight: 600; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
+            margin-bottom: 25px; padding: 15px 25px; background: #eef2f3; border-radius: 12px; 
+            font-size: 18px; color: #34495e; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
         }
+        .class-badge { background: #34495e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; position: relative; min-height: 200px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 15px 10px; border-bottom: 1px solid #eee; text-align: center; }
+        th { background-color: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; }
         
-        .class-badge { 
-            background: #0f172a; 
-            color: white; 
-            padding: 6px 16px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-        }
+        .subject-name { text-align: left; font-weight: bold; color: #2c3e50; padding-left: 20px; min-width: 180px; }
 
-        /* Ցուցակի հիմնական կառուցվածքը */
-        .marks-list {
-            position: relative;
-            min-height: 200px;
-        }
-
-        /* Առարկայի տողը՝ ըստ նկարի դիզայնի */
-        .subject-row {
-            display: flex;
-            align-items: center;
-            padding: 14px 8px;
-            border-bottom: 1px solid #e2e8f0;
-            transition: background 0.2s;
-        }
-        
-        .subject-row:hover {
-            background-color: #f8fafc;
-        }
-        
-        .subject-name { 
-            font-size: 16px; 
-            font-weight: 500; 
-            color: #0f172a;
-            flex-grow: 1;
-        }
-
-        /* Կիսամյակների և տարեկանի գնահատականների արկղը */
-        .marks-container {
-            display: flex;
-            gap: 25px; /* Հեռավորությունը կիսամյակների միջև */
-            align-items: center;
-        }
-
-        .mark-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 65px;
-        }
-
-        .mark-label {
-            font-size: 10px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
-
-        /* Նկարի պես փոքրիկ կլոր գնահատականները */
         .mark-box {
-            width: 22px;
-            height: 22px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 11px;
-            color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 40px; height: 40px; margin: auto; display: flex; 
+            justify-content: center; align-items: center; border-radius: 8px; 
+            font-weight: bold; font-size: 16px; color: white; transition: 0.3s;
         }
 
-        /* Գույները՝ ճիշտ ինչպես նկարում */
-        .m-danger { background-color: #ef4444; }   /* 1-4 */
-        .m-warning { background-color: #f1c40f; }  /* 5-6 (Դեղին) */
-        .m-info { background-color: #3498db; }     /* 7-8 (Կապույտ) */
-        .m-success { background-color: #2ecc71; }  /* 9-10 (Կանաչ) */
-        
-        /* Եթե գնահատական չկա, ցուցադրում ենք նուրբ գծիկ */
-        .m-none { 
-            background-color: transparent; 
-            color: #cbd5e1; 
-            box-shadow: none;
-            font-weight: normal;
-        }
+        .m-danger { background-color: var(--danger); }
+        .m-warning { background-color: var(--warning); }
+        .m-info { background-color: var(--info); }
+        .m-success { background-color: var(--success); }
+        .m-none { background-color: var(--none); color: #999; }
 
-        .logout-container {
-            text-align: center;
-            margin-top: 35px;
-        }
+        .annual-col { background-color: #fcfcfc; border-left: 2px solid #eee; }
 
         .logout-btn { 
-            display: inline-block; 
-            color: #64748b; 
-            text-decoration: none; 
-            font-weight: 600; 
-            font-size: 14px;
-            border: 1px solid #cbd5e1; 
-            padding: 10px 24px; 
-            border-radius: 8px; 
-            transition: 0.2s;
+            display: inline-block; margin-top: 30px; color: #e74c3c; text-decoration: none; 
+            font-weight: bold; border: 2px solid #e74c3c; padding: 10px 25px; border-radius: 10px; transition: 0.3s;
         }
-        
-        .logout-btn:hover { 
-            background: #f1f5f9; 
-            color: #1e293b; 
-        }
+        .logout-btn:hover { background: #e74c3c; color: white; }
 
         #loading-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); display: flex; justify-content: center;
-            align-items: center; font-weight: 600; color: #3498db; font-size: 16px;
+            background: rgba(255,255,255,0.8); display: flex; justify-content: center;
+            align-items: center; font-weight: bold; color: var(--info);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-title">ԱՇԱԿԵՐՏԻ ՏԱՐԵՎԵՐՋՅԱՆ ԳՆԱՀԱՏԱԿԱՆՆԵՐԸ</div>
+    <div class="header-title">ԱՏԵՍՏԱՏ</div>
     
     <div class="student-info">
         <span id="stName">Աշակերտ՝ -</span>
         <span class="class-badge" id="stClass">Դասարան՝ Բեռնվում է...</span>
     </div>
 
-    <div class="marks-list">
-        <div id="loading-overlay">Տվյալները բեռնվում են...</div>
-        <div id="marksBody"></div>
+    <div class="table-wrapper">
+        <div id="loading-overlay">Բեռնվում է...</div>
+        <table>
+            <thead>
+                <tr>
+                    <th class="subject-name">Առարկա</th>
+                    <th>1-ին Կիսամյակ</th>
+                    <th>2-րդ Կիսամյակ</th>
+                    <th class="annual-col">Տարեկան</th>
+                </tr>
+            </thead>
+            <tbody id="marksBody"></tbody>
+        </table>
     </div>
 
-    <div class="logout-container">
-        <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
-    </div>
+    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
 </div>
 
 <script>
+    // Վերջնական թարմացված հղումը
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyePREFn_ZczjKuuv2ElcVPz5Bj9uz7b9yMUGRiVTIf5QTGxNKB4EEh14kSZxCkkCND/exec";
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
 
     const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
     document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
 
-    // Գնահատականի կլորակ սարքող ֆունկցիա
     function getMarkHTML(mark) {
         if (!mark || mark === "-" || mark === "") return `<div class="mark-box m-none">-</div>`;
         const n = parseInt(mark);
@@ -201,19 +110,21 @@
             const response = await fetch(SCRIPT_URL);
             const rows = await response.json(); 
             
-            const listContainer = document.getElementById('marksBody');
-            listContainer.innerHTML = '';
+            const tbody = document.getElementById('marksBody');
+            tbody.innerHTML = '';
             document.getElementById('loading-overlay').style.display = 'none';
 
-            // Դասարանը ավտոմատ որոշել
+            // Գտնում ենք տվյալ աշակերտի առաջին իսկ տողը՝ դասարանը իմանալու համար
             const studentRow = rows.find(r => r[0] === currentStudent);
             if (studentRow && studentRow[4]) {
+                // Եթե աղյուսակի 5-րդ սյունակում (r[4]) կա դասարանը, տեղադրում ենք այն
                 document.getElementById('stClass').innerText = "Դասարան՝ " + studentRow[4];
             } else {
                 document.getElementById('stClass').innerText = "Դասարան՝ -";
             }
 
             subjects.forEach(sub => {
+                // row[0] - Անուն, row[1] - Առարկա, row[2] - Գնահատական, row[3] - Կիսամյակ
                 const sem1Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "1");
                 const sem2Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "2");
 
@@ -221,35 +132,25 @@
                 const m2 = sem2Row ? sem2Row[2] : "-";
                 
                 let annual = "-";
+                // Հաշվարկում ենք տարեկանը միայն եթե երկու կիսամյակն էլ ունեն գնահատական
                 if (m1 !== "-" && m2 !== "-" && m1 !== "" && m2 !== "") {
                     annual = Math.round((parseInt(m1) + parseInt(m2)) / 2);
                 }
 
-                // Գեներացնում ենք նոր տողերը՝ Flexbox դասավորվածությամբ
-                listContainer.innerHTML += `
-                    <div class="subject-row">
-                        <div class="subject-name">${sub}</div>
-                        <div class="marks-container">
-                            <div class="mark-block">
-                                <span class="mark-label">1-ին կիս.</span>
-                                ${getMarkHTML(m1)}
-                            </div>
-                            <div class="mark-block">
-                                <span class="mark-label">2-րդ կիս.</span>
-                                ${getMarkHTML(m2)}
-                            </div>
-                            <div class="mark-block" style="border-left: 1px dashed #cbd5e1; padding-left: 15px;">
-                                <span class="mark-label" style="color: #64748b;">Տարեկան</span>
-                                ${getMarkHTML(annual)}
-                            </div>
-                        </div>
-                    </div>
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="subject-name">${sub}</td>
+                        <td>${getMarkHTML(m1)}</td>
+                        <td>${getMarkHTML(m2)}</td>
+                        <td class="annual-col">${getMarkHTML(annual)}</td>
+                    </tr>
                 `;
             });
         } catch (error) {
             console.error("Սխալ տվյալները բեռնելիս:", error);
             document.getElementById('loading-overlay').innerText = "Սխալ՝ կապի խափանում:";
             document.getElementById('loading-overlay').style.color = "red";
+            document.getElementById('stClass').innerText = "Դասարան՝ Սխալ";
         }
     }
 
