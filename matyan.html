@@ -9,11 +9,12 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ուսուցչի Մատյան</title>
+    <title>Էլեկտրոնային Մատյան</title>
     <style>
         :root { 
             --primary: #4a90e2; 
-            --bg: #f0f4f8; 
+            --bg: #eef1f2; 
+            --sidebar-bg: #1a1a1a;
             --text: #2c3e50; 
             --success: #2ecc71; 
             --border: #dee2e6; 
@@ -24,17 +25,167 @@
             font-family: 'Sylfaen', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg); 
             margin: 0; 
-            padding: 10px; 
+            padding: 0; 
             color: var(--text); 
+            display: flex;
+            min-height: 100vh;
         }
 
+        /* Ձախակողմյան Մենյու (Sidebar) */
+        .sidebar {
+            width: 240px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            padding: 0 20px 20px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #b3b3b3;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background-color: #2b2b2b;
+            color: white;
+            border-left: 4px solid #e74c3c;
+        }
+
+        /* Հիմնական Կոնտենտ */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            max-width: calc(100% - 240px);
+            box-sizing: border-box;
+        }
+
+        .page-title-section {
+            margin-bottom: 5px;
+        }
+
+        .region-text {
+            color: #e74c3c;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .sub-title {
+            color: #555;
+            margin: 5px 0 25px 0;
+            font-size: 22px;
+            font-weight: normal;
+        }
+
+        .section-heading {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Դասարանների Քարտերի Ցանց (Grid) */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            transition: transform 0.2s;
+        }
+
+        .class-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .class-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .class-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #444;
+            margin: 0;
+        }
+
+        .lang-info {
+            font-size: 11px;
+            color: #888;
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* Սիգմա Կոճակ */
+        .sigma-btn {
+            background: white;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 6px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sigma-btn:hover, .sigma-btn.active {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Գնահատման Մատյանի Կոնտեյներ */
         .container { 
-            max-width: 100%; 
-            margin: auto; 
             background: white; 
-            padding: 15px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); 
+            margin-top: 20px;
         }
 
         .header-section { 
@@ -183,10 +334,11 @@
 
         @media print {
             @page { size: landscape; margin: 8mm; }
-            .selector-box, .action-buttons, .logout-btn, #loading-overlay, .header-section h2 { display: none !important; }
+            .sidebar, .page-title-section, .section-heading, .cards-grid, .selector-box, .action-buttons, .logout-btn, #loading-overlay, .header-section h2 { display: none !important; }
+            .main-content { max-width: 100% !important; padding: 0 !important; }
             .print-header { display: block !important; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 15px; color: black; border-bottom: 2px solid #000; padding-bottom: 5px; }
             body { background: white !important; color: black !important; padding: 0; margin: 0; }
-            .container { box-shadow: none !important; padding: 0 !important; background: transparent !important; }
+            .container { box-shadow: none !important; padding: 0 !important; background: transparent !important; margin-top: 0 !important; }
             .table-wrapper { overflow: visible !important; border: none !important; }
             table { width: max-content !important; min-width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; }
             th, td { border: 1px solid #000 !important; padding: 5px 3px !important; color: black !important; font-size: 11px !important; }
@@ -202,44 +354,87 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="print-header" id="print-title">Ուսուցչի Մատյան</div>
+<div class="sidebar">
+    <div class="sidebar-brand">Էլեկտրոնային Մատյան</div>
+    <div class="sidebar-menu">
+        <div class="sidebar-item active">🏠 Գլխավոր Էջ</div>
+    </div>
+</div>
 
-    <div class="header-section">
-        <h2>Ուսուցչի Մատյան</h2>
-        <div class="action-buttons">
-            <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
-            <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
-            <button onclick="logout()" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</button>
+<div class="main-content">
+    <div class="page-title-section">
+        <p class="region-text">ք. Երևանի</p>
+        <h1 class="sub-title">դասարաններ</h1>
+    </div>
+
+    <div class="section-heading">Դասավանդվող դասարաններ</div>
+
+    <div class="cards-grid">
+        <div class="class-card">
+            <div class="class-card-header">
+                <h3 class="class-name">10դ</h3>
+                <div class="lang-info">Ուսուցման լեզու:<br><b>Հայերեն</b></div>
+            </div>
+            <div class="card-actions">
+                <button class="sigma-btn class-card-btn" onclick="selectClassCard('10d', this)">∑</button>
+            </div>
+        </div>
+
+        <div class="class-card">
+            <div class="class-card-header">
+                <h3 class="class-name">11ա</h3>
+                <div class="lang-info">Ուսուցման լեզու:<br><b>Հայերեն</b></div>
+            </div>
+            <div class="card-actions">
+                <button class="sigma-btn class-card-btn" onclick="selectClassCard('11a', this)">∑</button>
+            </div>
+        </div>
+
+        <div class="class-card">
+            <div class="class-card-header">
+                <h3 class="class-name">12ա</h3>
+                <div class="lang-info">Ուսուցման լեզու:<br><b>Հայերեն</b></div>
+            </div>
+            <div class="card-actions">
+                <button class="sigma-btn class-card-btn" onclick="selectClassCard('12a', this)">∑</button>
+            </div>
         </div>
     </div>
 
-    <div class="selector-box">
-        <div class="btn-group">
-            <button class="btn class-btn" onclick="selectClass('11ա', this)">11ա Դասարան</button>
-            <button class="btn class-btn" onclick="selectClass('12ա', this)">12ա Դասարան</button>
-            <button class="btn class-btn" onclick="selectClass('10դ', this)">10դ Դասարան</button>
-        </div>
-        <div id="semester-section" class="btn-group">
-            <button class="btn sem-btn" onclick="selectType(1, this)">1-ին Կիսամյակ</button>
-            <button class="btn sem-btn" onclick="selectType(2, this)">2-րդ Կիսամյակ</button>
-            <button class="btn sem-btn" style="border-color:#9b59b6; color:#9b59b6;" onclick="selectType('annual', this)">ՏԱՐԵԿԱՆ</button>
-        </div>
-    </div>
+    <div id="journal-container" class="container" style="display: none;">
+        <div class="print-header" id="print-title">Ուսուցչի Մատյան</div>
 
-    <div id="marks-table-container" style="display:none;">
-        <div class="table-wrapper">
-            <div id="loading-overlay">Բեռնվում է...</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th><th class="student-name">Աշակերտ</th>
-                        <th>Հանրահաշիվ</th><th>Երկրաչափ.</th><th>Ֆիզիկա</th><th>Հայոց Լեզու</th><th>Գրական.</th>
-                        <th>Պատմություն</th><th>Օտար Լեզու</th><th>Ռուսաց Լեզու</th><th>Ինֆորմատ.</th><th>Հասարակագ.</th><th>Մասնագ. մաթեմ.</th>
-                    </tr>
-                </thead>
-                <tbody id="students-list"></tbody>
-            </table>
+        <div class="header-section">
+            <h2 id="journal-title">Ուսուցչի Մատյան</h2>
+            <div class="action-buttons">
+                <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
+                <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
+                <button onclick="logout()" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</button>
+            </div>
+        </div>
+
+        <div class="selector-box">
+            <div id="semester-section" class="btn-group">
+                <button class="btn sem-btn" onclick="selectType(1, this)">1-ին Կիսամյակ</button>
+                <button class="btn sem-btn" onclick="selectType(2, this)">2-րդ Կիսամյակ</button>
+                <button class="btn sem-btn" style="border-color:#9b59b6; color:#9b59b6;" onclick="selectType('annual', this)">ՏԱՐԵԿԱՆ</button>
+            </div>
+        </div>
+
+        <div id="marks-table-container" style="display:none;">
+            <div class="table-wrapper">
+                <div id="loading-overlay">Բեռնվում է...</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th><th class="student-name">Աշակերտ</th>
+                            <th>Հանրահաշիվ</th><th>Երկրաչափ.</th><th>Ֆիզիկա</th><th>Հայոց Լեզու</th><th>Գրական.</th>
+                            <th>Պատմություն</th><th>Օտար Լեզու</th><th>Ռուսաց Լեզու</th><th>Ինֆորմատ.</th><th>Հասարակագ.</th><th>Մասնագ. մաթեմ.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-list"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -254,11 +449,29 @@
     let currentClass = '', currentView = '', allData = []; 
     
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն", "Մասնագիտացված մաթեմատիկա"];
+    
+    // Տվյալների օբյեկտը նույնպես դասավորված է աճման կարգով
     const studentsData = {
+        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի'],
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
-        '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ'],
-        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի']
+        '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
+
+    function selectClassCard(clsCode, btn) {
+        let classNameMapping = { '10d': '10դ', '11a': '11ա', '12a': '12ա' };
+        currentClass = classNameMapping[clsCode];
+
+        document.querySelectorAll('.class-card-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('marks-table-container').style.display = 'none';
+
+        document.getElementById('journal-container').style.display = 'block';
+        updatePrintTitle();
+        
+        document.getElementById('journal-container').scrollIntoView({ behavior: 'smooth' });
+    }
 
     async function refreshData() {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -269,16 +482,11 @@
         document.getElementById('loading-overlay').style.display = 'none';
     }
 
-    function selectClass(cls, btn) {
-        currentClass = cls;
-        document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('semester-section').style.display = 'flex';
-        document.getElementById('marks-table-container').style.display = 'none';
-        updatePrintTitle();
-    }
-
     async function selectType(type, btn) {
+        if (!currentClass) {
+            alert("Խնդրում ենք նախ ընտրել դասարանը։");
+            return;
+        }
         currentView = type;
         document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -288,12 +496,14 @@
     }
 
     function updatePrintTitle() {
-        let viewText = "";
+        let viewText = "Ընտրեք կիսամյակը";
         if (currentView === 1) viewText = "1-ին Կիսամյակ";
         else if (currentView === 2) viewText = "2-րդ Կիսամյակ";
         else if (currentView === 'annual') viewText = "Տարեկան";
 
-        document.getElementById('print-title').innerText = `Ուսուցչի Մատյան | Դասարան՝ ${currentClass} | ${viewText}`;
+        let fullTitle = `Ուսուցչի Մատյան | Դասարան՝ ${currentClass || '---'} | ${viewText}`;
+        document.getElementById('print-title').innerText = fullTitle;
+        document.getElementById('journal-title').innerText = fullTitle;
     }
 
     function renderTable() {
@@ -317,7 +527,6 @@
                     let annual = (m1 > 0 && m2 > 0) ? Math.round((m1 + m2) / 2) : "-";
                     cells += `<td><span style="font-weight:bold; color:#9b59b6;">${annual}</span></td>`;
                 } else {
-                    // Ավելացվել են data-row և data-col ատրիբուտներ սլաքների նավիգացիայի համար
                     cells += `<td><input type="number" class="mark-input" data-row="${rIdx}" data-col="${cIdx}" data-student="${student}" data-subject="${sub}" 
                                data-original="${val}" value="${val}" min="1" max="10" oninput="validateMark(this)"></td>`;
                 }
@@ -325,7 +534,6 @@
             list.innerHTML += `<tr><td>${rIdx+1}</td><td class="student-name">${student}</td>${cells}</tr>`;
         });
 
-        // ՆԱՎԻԳԱՑԻԱ ՍԼԱՔՆԵՐՈՎ
         setupArrowNavigation();
     }
 
@@ -340,25 +548,13 @@
             let targetCol = currentCol;
 
             switch (e.key) {
-                case 'ArrowUp':
-                    targetRow--;
-                    e.preventDefault(); // Էջի սքրոլը անջատելու համար
-                    break;
-                case 'ArrowDown':
-                    targetRow++;
-                    e.preventDefault();
-                    break;
-                case 'ArrowLeft':
-                    targetCol--;
-                    break;
-                case 'ArrowRight':
-                    targetCol++;
-                    break;
-                default:
-                    return; // Թողնել, որ մնացած կոճակները (թվերը) սովորական աշխատեն
+                case 'ArrowUp': targetRow--; e.preventDefault(); break;
+                case 'ArrowDown': targetRow++; e.preventDefault(); break;
+                case 'ArrowLeft': targetCol--; break;
+                case 'ArrowRight': targetCol++; break;
+                default: return;
             }
 
-            // Եթե տողից դուրս է գալիս հորիզոնական, անցնում է հաջորդ/նախորդ աշակերտին
             if (targetCol < 0) {
                 targetRow--;
                 targetCol = subjects.length - 1;
@@ -367,11 +563,10 @@
                 targetCol = 0;
             }
 
-            // Գտնում ենք թիրախային input-ը
             const nextInput = document.querySelector(`.mark-input[data-row="${targetRow}"][data-col="${targetCol}"]`);
             if (nextInput) {
                 nextInput.focus();
-                nextInput.select(); // Ավտոմատ նշում է թիվը, որ հեշտ լինի ջնջել/փոխել
+                nextInput.select();
             }
         });
     }
@@ -385,7 +580,6 @@
     async function saveAll() {
         const inputs = document.querySelectorAll('.mark-input');
         const saveBtn = document.getElementById('save-btn-ui');
-        
         let marksArray = [];
 
         inputs.forEach(input => {
@@ -417,9 +611,7 @@
 
             await fetch(SCRIPT_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params.toString()
             });
 
