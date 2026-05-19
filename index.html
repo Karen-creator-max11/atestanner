@@ -33,39 +33,36 @@
     const studentsData = {
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ'],
-        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիел', 'Քեշիշյան Մարի']
+        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի']
     };
 
-    // Բարելավված Տառադարձման ֆունկցիա (Translit)
+    // Ճշգրիտ Տառադարձման ֆունկցիա (Translit) - Միայն փոքրատառ օգտագործման համար
     function transliterate(text) {
         if (!text) return "";
         
-        // Նախ փոխարինում ենք երկհնչյունները, որպեսզի տառ-տառ չբաժանվեն
-        let processed = text;
-        processed = processed.replace(/Ու/g, 'U').replace(/ու/g, 'u');
-        processed = processed.replace(/Եվ/g, 'Ev').replace(/եվ/g, 'ev');
+        let processed = text.toLowerCase();
+        
+        // Նախ փոխարինում ենք բարդ հնչյունները
+        processed = processed.replace(/ու/g, 'u');
+        processed = processed.replace(/եվ/g, 'ev');
+        processed = processed.replace(/և/g, 'ev');
 
         const armToLat = {
-            'Ա': 'A', 'ա': 'a', 'Բ': 'B', 'բ': 'b', 'Գ': 'G', 'գ': 'g', 'Դ': 'D', 'դ': 'd',
-            'Ե': 'E', 'ե': 'e', 'Զ': 'Z', 'զ': 'z', 'Է': 'E', 'է': 'e', 'Ը': 'E', 'ը': 'e',
-            'Թ': 'T', 'թ': 't', 'Ժ': 'Zh', 'ժ': 'zh', 'Ի': 'I', 'ի': 'i', 'Լ': 'L', 'լ': 'l',
-            'Խ': 'Kh', 'խ': 'kh', 'Ծ': 'Ts', 'ծ': 'ts', 'Կ': 'K', 'կ': 'k', 'Հ': 'H', 'հ': 'h',
-            'Ձ': 'Dz', 'ձ': 'dz', 'Ղ': 'Gh', 'ղ': 'gh', 'Ճ': 'Ch', 'ճ': 'ch', 'Մ': 'M', 'մ': 'm',
-            'Յ': 'Y', 'յ': 'y', 'Ն': 'N', 'ն': 'n', 'Շ': 'Sh', 'շ': 'sh', 'Ո': 'O', 'ո': 'o',
-            'Չ': 'Ch', 'չ': 'ch', 'Պ': 'P', 'պ': 'p', 'Ջ': 'J', 'ջ': 'j', 'Ռ': 'R', 'ռ': 'r',
-            'Ս': 'S', 'ս': 's', 'Վ': 'V', 'վ': 'v', 'Տ': 'T', 'տ': 't', 'Ր': 'R', 'ր': 'r',
-            'Ց': 'Ts', 'ց': 'ts', 'Փ': 'P', 'փ': 'p', 'Ք': 'Q', 'ք': 'q', 'Օ': 'O', 'օ': 'o', 
-            'Ֆ': 'F', 'ֆ': 'f'
+            'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'e',
+            'թ': 't', 'ժ': 'zh', 'ի': 'i', 'լ': 'l', 'խ': 'kh', 'ծ': 'ts', 'կ': 'k', 'հ': 'h',
+            'ձ': 'dz', 'ղ': 'gh', 'ճ': 'ch', 'մ': 'm', 'յ': 'y', 'ն': 'n', 'շ': 'sh', 'ո': 'o',
+            'չ': 'ch', 'պ': 'p', 'ջ': 'j', 'ռ': 'r', 'ս': 's', 'վ': 'v', 'տ': 't', 'ր': 'r',
+            'ց': 'ts', 'փ': 'p', 'ք': 'q', 'օ': 'o', 'ֆ': 'f'
         };
         
         return processed.split('').map(char => armToLat[char] || char).join('');
     }
 
-    // Ավտոմատ մաքրում և դարձնում է լատինատառ ցանկացած դասարանի տառ (ա->a, բ->b, գ->g, դ->d...)
+    // Դասարանի անունը մաքրող և լատինատառ դարձնող ֆունկցիա
     function cleanClassName(className) {
         const classLetters = { 'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e' };
         let num = className.match(/\d+/)[0]; // Վերցնում է թիվը (օր.՝ 11)
-        let letPart = className.replace(num, '').css || className.replace(num, ''); // Վերցնում է տառը
+        let letPart = className.replace(num, '').trim().toLowerCase(); // Վերցնում է տառը
         let safeLetter = classLetters[letPart] || letPart;
         return num + safeLetter;
     }
@@ -101,25 +98,25 @@
                 const fullName = classStudents[i];
                 const parts = fullName.split(' ');
                 const lastName = parts[0];
-                const firstName = parts[1] || ""; // Եթե անունը չլինի, սխալ չտա
+                const firstName = parts[1] || "";
 
                 // Լատինատառ դարձնել
                 const latLastName = transliterate(lastName);
                 const latFirstName = transliterate(firstName);
 
-                // Գեներացնում ենք օգտանունը
-                const generatedUsername = `${latLastName}_${latFirstName}_${safeClassName}`.toLowerCase();
+                // Գեներացնում ենք օգտանունը՝ Ազգանուն_Անուն_դասարան ֆորմատով
+                const generatedUsername = `${latLastName}_${latFirstName}_${safeClassName}`;
 
                 if (user === generatedUsername && encodedPass === STUDENT_PASS_ENCODED) {
                     studentFound = true;
                     sessionStorage.setItem('isLoggedIn', 'student');
                     localStorage.setItem('isLoggedIn', 'true');
                     
-                    // ԱՅՍՏԵՂ ՊԱՀՊԱՆՈՒՄ ԵՆՔ ՏՎՅԱԼՆԵՐԸ ԱՇԱԿԵՐՏԻ ԷՋԻ ՀԱՄԱՐ
-                    localStorage.setItem('studentName', fullName); // Հայատառ Անուն Ազգանուն
-                    localStorage.setItem('studentClass', className); // Իրական դասարանը (օր.՝ 11ա)
+                    // Տվյալների պահպանում աշակերտի էջի համար
+                    localStorage.setItem('studentName', fullName); 
+                    localStorage.setItem('studentClass', className); 
                     
-                    window.location.href = "student_view.html"; // Համոզվեք, որ ֆայլի անունը ճիշտ է
+                    window.location.href = "student_view.html";
                     break;
                 }
             }
