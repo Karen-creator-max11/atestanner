@@ -36,23 +36,32 @@
         '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի']
     };
 
-    // Ճշգրիտ Տառադարձման ֆունկցիա (Translit) - Միայն փոքրատառ օգտագործման համար
+    // Ճշգրիտ Տառադարձման ֆունկցիա (Translit)
     function transliterate(text) {
         if (!text) return "";
         
-        let processed = text.toLowerCase();
+        let processed = text.toLowerCase().trim();
         
-        // Նախ փոխարինում ենք բարդ հնչյունները
+        // Նախ փոխարինում ենք բարդ հնչյուններն ու երկհնչյունները
         processed = processed.replace(/ու/g, 'u');
         processed = processed.replace(/եվ/g, 'ev');
         processed = processed.replace(/և/g, 'ev');
+        processed = processed.replace(/չ/g, 'ch');
+        processed = processed.replace(/ճ/g, 'ch');
+        processed = processed.replace(/ջ/g, 'j');
+        processed = processed.replace(/ժ/g, 'zh');
+        processed = processed.replace(/խ/g, 'kh');
+        processed = processed.replace(/ծ/g, 'ts');
+        processed = processed.replace(/ձ/g, 'dz');
+        processed = processed.replace(/ղ/g, 'gh');
+        processed = processed.replace(/ց/g, 'ts');
+        processed = processed.replace(/շ/g, 'sh');
 
         const armToLat = {
             'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'e',
-            'թ': 't', 'ժ': 'zh', 'ի': 'i', 'լ': 'l', 'խ': 'kh', 'ծ': 'ts', 'կ': 'k', 'հ': 'h',
-            'ձ': 'dz', 'ղ': 'gh', 'ճ': 'ch', 'մ': 'm', 'յ': 'y', 'ն': 'n', 'շ': 'sh', 'ո': 'o',
-            'չ': 'ch', 'պ': 'p', 'ջ': 'j', 'ռ': 'r', 'ս': 's', 'վ': 'v', 'տ': 't', 'ր': 'r',
-            'ց': 'ts', 'փ': 'p', 'ք': 'q', 'օ': 'o', 'ֆ': 'f'
+            'թ': 't', 'ի': 'i', 'լ': 'l', 'կ': 'k', 'հ': 'h', 'մ': 'm', 'յ': 'y', 'ն': 'n', 
+            'ո': 'o', 'պ': 'p', 'ռ': 'r', 'ս': 's', 'վ': 'v', 'տ': 't', 'ր': 'r', 'փ': 'p', 
+            'ք': 'q', 'օ': 'o', 'ֆ': 'f'
         };
         
         return processed.split('').map(char => armToLat[char] || char).join('');
@@ -61,8 +70,8 @@
     // Դասարանի անունը մաքրող և լատինատառ դարձնող ֆունկցիա
     function cleanClassName(className) {
         const classLetters = { 'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e' };
-        let num = className.match(/\d+/)[0]; // Վերցնում է թիվը (օր.՝ 11)
-        let letPart = className.replace(num, '').trim().toLowerCase(); // Վերցնում է տառը
+        let num = className.match(/\d+/)[0]; 
+        let letPart = className.replace(num, '').trim().toLowerCase(); 
         let safeLetter = classLetters[letPart] || letPart;
         return num + safeLetter;
     }
@@ -104,7 +113,7 @@
                 const latLastName = transliterate(lastName);
                 const latFirstName = transliterate(firstName);
 
-                // Գեներացնում ենք օգտանունը՝ Ազգանուն_Անուն_դասարան ֆորմատով
+                // Գեներացնում ենք օգտանունը՝ ազգանուն_անուն_դասարան ֆորմատով
                 const generatedUsername = `${latLastName}_${latFirstName}_${safeClassName}`;
 
                 if (user === generatedUsername && encodedPass === STUDENT_PASS_ENCODED) {
