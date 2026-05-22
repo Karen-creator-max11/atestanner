@@ -7,9 +7,10 @@
     <style>
         :root {
             --danger: #e74c3c;   /* 1-4 */
-            --warning: #f39c12;  /* 5-6 */
+            --warning: #FCD116;  /* 5-6 */
             --info: #3498db;     /* 7-8 */
             --success: #2ecc71;  /* 9-10 */
+            --exam-purple: #9b59b6; /* Մանուշակագույն՝ քննությունների համար */
             --none: #f1f1f1;
         }
 
@@ -24,29 +25,57 @@
         }
         .class-badge { background: #34495e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
 
-        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; position: relative; min-height: 200px; }
+        .section-title { font-size: 22px; font-weight: bold; color: #2c3e50; text-align: left; margin: 35px 0 15px 5px; letter-spacing: 1px; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #ddd; position: relative; min-height: 150px; }
         table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 15px 10px; border-bottom: 1px solid #eee; text-align: center; }
-        th { background-color: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: center; vertical-align: middle; }
+        th { background-color: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; font-weight: bold; }
         
         .subject-name { text-align: left; font-weight: bold; color: #2c3e50; padding-left: 20px; min-width: 180px; }
 
-        .mark-box {
-            width: 40px; height: 40px; margin: auto; display: flex; 
-            justify-content: center; align-items: center; border-radius: 8px; 
-            font-weight: bold; font-size: 16px; color: white; transition: 0.3s;
+        /* Գնահատականների կլորակներ */
+        .mark-circle {
+            width: 32px; height: 32px; margin: auto; display: flex; 
+            justify-content: center; align-items: center; border-radius: 50%; 
+            font-weight: bold; font-size: 14px; color: white; transition: 0.3s;
+            flex-shrink: 0;
         }
 
         .m-danger { background-color: var(--danger); }
-        .m-warning { background-color: var(--warning); }
+        .m-warning { background-color: var(--warning); color: #2c3e50; }
         .m-info { background-color: var(--info); }
         .m-success { background-color: var(--success); }
-        .m-none { background-color: var(--none); color: #999; }
+        .m-exam { background-color: var(--exam-purple); margin: 0; } 
+        .m-none { background-color: var(--none); color: #999; font-weight: normal; }
 
         .annual-col { background-color: #fcfcfc; border-left: 2px solid #eee; }
 
+        /* Քննական քարտեր՝ ԼԻՈՎԻՆ ԻՐԱՐ ՏԱԿ */
+        #examsSection { display: none; } 
+        .exams-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: flex-start; margin-top: 10px; }
+        
+        .exam-card { 
+            background: #fafbfc; border: 1px solid #e1e8ed; border-radius: 12px; padding: 18px 20px; 
+            width: calc(33.33% - 10px); box-sizing: border-box; 
+            display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left;
+        }
+        
+        .exam-subject { font-weight: bold; color: #34495e; font-size: 16px; margin-bottom: 2px; }
+        
+        .status-msg { font-size: 13px; font-weight: bold; margin-top: 2px; white-space: nowrap; }
+        .status-pass { color: #2ecc71; } 
+        .status-fail { color: #c0392b; } 
+
+        @media (max-width: 900px) {
+            .exam-card { width: calc(50% - 8px); }
+        }
+        @media (max-width: 550px) {
+            .exam-card { width: 100%; }
+        }
+
         .logout-btn { 
-            display: inline-block; margin-top: 30px; color: #e74c3c; text-decoration: none; 
+            display: inline-block; margin-top: 40px; color: #e74c3c; text-decoration: none; 
             font-weight: bold; border: 2px solid #e74c3c; padding: 10px 25px; border-radius: 10px; transition: 0.3s;
         }
         .logout-btn:hover { background: #e74c3c; color: white; }
@@ -54,7 +83,7 @@
         #loading-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.8); display: flex; justify-content: center;
-            align-items: center; font-weight: bold; color: var(--info);
+            align-items: center; font-weight: bold; color: #3498db; z-index: 10;
         }
     </style>
 </head>
@@ -68,6 +97,7 @@
         <span class="class-badge" id="stClass">Դասարան՝ Բեռնվում է...</span>
     </div>
 
+    <div class="section-title">Ընթացիկ Գնահատականներ</div>
     <div class="table-wrapper">
         <div id="loading-overlay">Բեռնվում է...</div>
         <table>
@@ -83,26 +113,55 @@
         </table>
     </div>
 
-    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
+    <div id="examsSection">
+        <div class="section-title">Քննական Շրջան</div>
+        <div class="exams-grid" id="examsBody"></div>
+    </div>
+
+    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱմԱԿԱՐԳԻՑ</a>
 </div>
 
 <script>
-    // Վերջնական թարմացված հղումը
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8fcjCR0_qNV1ofstkHnxJKFuajdnfFsmrW0w7kCY15nfxMbJ1WQGWTjskSuWktCVZ/exec";
-    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Մասնագիտացված մաթեմատիկա", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXhLT76CLsNbXGkcWMrvVx3_AmsMoL0-hun0rKSDHmMPnJedhM0uShmSWcO7gEL15Y/exec";
+    
+    // Ավելացվեց "Մաթեմատիկա"-ն, որպեսզի քննության տողը գտնի
+    const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Մաթեմատիկա", "Մասնագիտացված մաթեմատիկա", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
 
     const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
     document.getElementById('stName').innerText = "Աշակերտ՝ " + currentStudent;
 
     function getMarkHTML(mark) {
-        if (!mark || mark === "-" || mark === "") return `<div class="mark-box m-none">-</div>`;
+        if (!mark || mark === "-" || mark === "") return `<div class="mark-circle m-none">-</div>`;
         const n = parseInt(mark);
         let cls = "m-none";
         if (n >= 1 && n <= 4) cls = "m-danger";
         else if (n >= 5 && n <= 6) cls = "m-warning";
         else if (n >= 7 && n <= 8) cls = "m-info";
         else if (n >= 9 && n <= 10) cls = "m-success";
-        return `<div class="mark-box ${cls}">${n}</div>`;
+        return `<div class="mark-circle ${cls}">${n}</div>`;
+    }
+
+    function getExamStatusHTML(mark) {
+        if (!mark || mark === "-" || mark === "") {
+            return `<div class="mark-circle m-none">-</div>`;
+        }
+        
+        const n = parseInt(mark);
+        let statusText = "";
+        let statusClass = "";
+
+        if (n >= 1 && n <= 7) {
+            statusText = "Վերաքննություն";
+            statusClass = "status-fail";
+        } else if (n >= 8 && n <= 20) {
+            statusText = "Հաջողությամբ հաղթահարել է";
+            statusClass = "status-pass";
+        }
+
+        return `
+            <div class="mark-circle m-exam">${n}</div>
+            <span class="status-msg ${statusClass}">${statusText}</span>
+        `;
     }
 
     async function loadDataFromSheets() {
@@ -111,41 +170,66 @@
             const rows = await response.json(); 
             
             const tbody = document.getElementById('marksBody');
+            const examsBody = document.getElementById('examsBody');
+            
             tbody.innerHTML = '';
+            examsBody.innerHTML = '';
             document.getElementById('loading-overlay').style.display = 'none';
 
-            // Գտնում ենք տվյալ աշակերտի առաջին իսկ տողը՝ դասարանը իմանալու համար
             const studentRow = rows.find(r => r[0] === currentStudent);
             if (studentRow && studentRow[4]) {
-                // Եթե աղյուսակի 5-րդ սյունակում (r[4]) կա դասարանը, տեղադրում ենք այն
                 document.getElementById('stClass').innerText = "Դասարան՝ " + studentRow[4];
             } else {
                 document.getElementById('stClass').innerText = "Դասարան՝ -";
             }
 
+            let hasExams = false;
+
             subjects.forEach(sub => {
-                // row[0] - Անուն, row[1] - Առարկա, row[2] - Գնահատական, row[3] - Կիսամյակ
                 const sem1Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "1");
                 const sem2Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "2");
+                
+                const examRow = rows.find(r => {
+                    if (r[0] !== currentStudent || r[1] !== sub) return false;
+                    const type = String(r[3]).toLowerCase().trim();
+                    return type === "exams" || type.includes("քնն") || type.includes("math") || type.includes("մաթ");
+                });
 
                 const m1 = sem1Row ? sem1Row[2] : "-";
                 const m2 = sem2Row ? sem2Row[2] : "-";
                 
                 let annual = "-";
-                // Հաշվարկում ենք տարեկանը միայն եթե երկու կիսամյակն էլ ունեն գնահատական
                 if (m1 !== "-" && m2 !== "-" && m1 !== "" && m2 !== "") {
                     annual = Math.round((parseInt(m1) + parseInt(m2)) / 2);
                 }
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="subject-name">${sub}</td>
-                        <td>${getMarkHTML(m1)}</td>
-                        <td>${getMarkHTML(m2)}</td>
-                        <td class="annual-col">${getMarkHTML(annual)}</td>
-                    </tr>
-                `;
+                // ԹԱՔՑՆԵԼ "Մաթեմատիկա" տողը ընթացիկ աղյուսակից, որպեսզի դատարկ չերևա
+                if (sub !== "Մաթեմատիկա") {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="subject-name">${sub}</td>
+                            <td>${getMarkHTML(m1)}</td>
+                            <td>${getMarkHTML(m2)}</td>
+                            <td class="annual-col">${getMarkHTML(annual)}</td>
+                        </tr>
+                    `;
+                }
+
+                if (examRow && examRow[2] !== "" && examRow[2] !== "-") {
+                    hasExams = true;
+                    examsBody.innerHTML += `
+                        <div class="exam-card">
+                            <span class="exam-subject">${sub}</span>
+                            ${getExamStatusHTML(examRow[2])}
+                        </div>
+                    `;
+                }
             });
+
+            if (hasExams) {
+                document.getElementById('examsSection').style.display = 'block';
+            }
+
         } catch (error) {
             console.error("Սխալ տվյալները բեռնելիս:", error);
             document.getElementById('loading-overlay').innerText = "Սխալ՝ կապի խափանում:";
