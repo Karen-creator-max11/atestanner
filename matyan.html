@@ -39,7 +39,14 @@
             color: white;
             padding: 20px 0;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Կոճակը ներքև տանելու համար */
             transition: all 0.3s ease;
+        }
+
+        .sidebar-top {
+            width: 100%;
         }
 
         .sidebar-brand {
@@ -73,6 +80,29 @@
             background-color: #2b2b2b;
             color: white;
             border-left: 4px solid #e74c3c;
+        }
+
+        /* Դուրս գալու կոճակը Sidebar-ի ներքևում */
+        .sidebar-logout-container {
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .sidebar-logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .sidebar-logout-btn:hover {
+            background: #e74c3c;
+            color: white;
         }
 
         /* Հիմնական Կոնտենտ */
@@ -244,7 +274,6 @@
             -webkit-overflow-scrolling: touch; 
         }
 
-        /* Հուշող էֆեկտ՝ հեռախոսով հասկանալու համար, որ աղյուսակը դեռ շարունակություն ունի աջ կողմում */
         .table-wrapper::after {
             content: '';
             position: absolute;
@@ -334,11 +363,7 @@
 
         .save-btn-top:disabled { background: #95a5a6; cursor: not-allowed; }
 
-        .logout-btn { 
-            color: #e74c3c; 
-            border: 1px solid #e74c3c; 
-            background: white; 
-        }
+        .action-buttons .logout-btn-header { display: none; } /* Թաքցնում ենք վերևի դուրս գալու կոճակը PC-ի վրա */
 
         #loading-overlay {
             display: none;
@@ -360,8 +385,15 @@
 
             .sidebar {
                 width: 100%;
-                padding: 10px 0;
+                padding: 10px 0 0 0;
                 box-sizing: border-box;
+                display: block; /* Չեղարկում ենք flex-ը հեռախոսի վրա */
+            }
+
+            .sidebar-top {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
 
             .sidebar-brand {
@@ -369,10 +401,12 @@
                 font-size: 15px;
                 text-align: center;
                 border-bottom: 1px solid #333;
+                width: 100%;
+                box-sizing: border-box;
             }
 
             .sidebar-menu {
-                margin: 8px 0 0 0;
+                margin: 8px 0;
                 display: flex;
                 justify-content: center;
             }
@@ -387,6 +421,11 @@
             .sidebar-item:hover, .sidebar-item.active {
                 background-color: #2b2b2b;
                 border-bottom: 3px solid #e74c3c;
+            }
+
+            /* Հեռախոսի վրա թաքցնում ենք սլայդբարի ներքևի կոճակը, որ վերևում սիրուն երևա */
+            .sidebar-logout-container {
+                display: none;
             }
 
             .main-content {
@@ -424,7 +463,7 @@
 
             .class-name {
                 font-size: 26px;
-                }
+            }
 
             .container {
                 padding: 14px;
@@ -450,9 +489,15 @@
                 gap: 8px;
             }
             
-            .logout-btn {
+            .action-buttons .logout-btn-header {
+                display: flex;
                 grid-column: span 2;
                 margin-top: 2px;
+                color: #e74c3c; 
+                border: 1px solid #e74c3c; 
+                background: white; 
+                justify-content: center;
+                align-items: center;
             }
 
             .btn-ui {
@@ -464,7 +509,6 @@
                 border-radius: 8px;
             }
 
-            /* Կիսամյակների ընտրության մոբայլ տեսքը */
             .btn-group {
                 width: 100%;
                 display: grid;
@@ -487,18 +531,22 @@
                 margin-bottom: 15px;
             }
 
-            /* ՈՒՂՂՈՒՄ՝ Աղյուսակի մոբայլ սահմանները և սյունակների ֆիքսված չափերը */
+            /* ՈՒՂՂՈՒՄ՝ Աշակերտների սյունակի չափսերի փոքրացում և ավելի ձախ տեղափոխում */
             table {
-                min-width: 850px; /* Քննությունների ժամանակ քիչ սյունակների դեպքում սիրուն տեղավորվելու համար */
+                min-width: 480px !important; /* Քննությունների ժամանակ աղյուսակը սեղմվում է, որ վանդակները երևան */
             }
 
             .student-name {
-                box-shadow: 4px 0 8px rgba(0,0,0,0.08); /* Ավելի հստակ ստվեր սքրոլի ժամանակ */
-                font-size: 13px;
-                min-width: 140px;
-                max-width: 140px;
-                padding-left: 10px;
-                background: #ffffff !important; /* Պարտադիր սպիտակ, որ գնահատականները տակից չերևան */
+                box-shadow: 2px 0 5px rgba(0,0,0,0.05); 
+                font-size: 12px;
+                min-width: 105px !important; /* Ավելի ձախ է գալիս բաժանարար գիծը */
+                max-width: 105px !important;
+                padding-left: 6px;
+                padding-right: 4px;
+                background: #ffffff !important; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis; /* Եթե անունը շատ երկար լինի, սիրուն կկրճատվի */
             }
             
             th.student-name {
@@ -506,13 +554,13 @@
             }
             
             input[type="number"] {
-                width: 40px;
-                height: 30px;
-                font-size: 15px;
+                width: 38px;
+                height: 28px;
+                font-size: 14px;
             }
 
             td {
-                padding: 6px 4px;
+                padding: 6px 3px;
             }
         }
 
@@ -539,9 +587,15 @@
 <body>
 
 <div class="sidebar">
-    <div class="sidebar-brand">Էլեկտրոնային Մատյան</div>
-    <div class="sidebar-menu">
-        <div class="sidebar-item active">🏠 Գլխավոր Էջ</div>
+    <div class="sidebar-top">
+        <div class="sidebar-brand">Էլեկտրոնային Մատյան</div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item active">🏠 Գլխավոր Էջ</div>
+        </div>
+    </div>
+    <!-- Դուրս գալու կոճակը PC տարբերակի համար՝ Sidebar-ի ամենաներքևում -->
+    <div class="sidebar-logout-container">
+        <button onclick="logout()" class="sidebar-logout-btn">ԴՈՒՐՍ ԳԱԼ</button>
     </div>
 </div>
 
@@ -593,7 +647,8 @@
             <div class="action-buttons">
                 <button class="btn-ui" style="background: #34495e; color: white; border: none;" onclick="window.print()">ՏՊԵԼ</button>
                 <button id="save-btn-ui" class="btn-ui save-btn-top" onclick="saveAll()">ՊԱՀՊԱՆԵԼ</button>
-                <button onclick="logout()" class="btn-ui logout-btn">ԴՈՒՐՍ ԳԱԼ</button>
+                <!-- Դուրս գալու կոճակը հեռախոսի էկրանի համար (կերևա միայն մոբայլում) -->
+                <button onclick="logout()" class="btn-ui logout-btn-header">ԴՈՒՐՍ ԳԱԼ</button>
             </div>
         </div>
 
@@ -636,7 +691,7 @@
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն", "Մասնագիտացված մաթեմատիկա"];
     
     const studentsData = {
-        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիελ', 'Քեշիշյան Մարի'],
+        '10դ': ['Ասատրյան Հակոբ', 'Բաբաջանյան Դավիթ', 'Բարսեղյան Անահիտ', 'Գարսոյան Լիլիթ', 'Գոգյան Գարիկ', 'Մարաբյան Արսեն', 'Մինասյան Ալլա', 'Մինասյան Մինաս', 'Պոտրոսյան Գաբրիել', 'Քեշիշյան Մարի'],
         '11ա': ['Աբգարյան Տաթևիկ', 'Աղեկյան Մանվել', 'Արամյան Արսեն', 'Արզումանյան Անժելա', 'Բաբայան Արյուսակ', 'Բաղդասարյան Արյուսակ', 'Բունիաթյան Գոհար', 'Գասպարյան Արսեն', 'Գյուլումյան Հասմիկ', 'Գրիգորյան Աննա', 'Զաքարյան Աշխեն', 'Խալաթյան Աշխեն', 'Կարապետյան Ալիսա', 'Հովհաննիսյան Մելինե', 'Մեսրոպյան Սոնա', 'Մուրադյան Արսեն', 'Ներսիսյան Մարինա', 'Նիկողոսյան Մարգարիտ', 'Շահբազյան Լիլիա', 'Սուքիսյան Նարինե'],
         '12ա': ['Աբելյան Զարուհի', 'Աբրահամյան Լիլիա', 'Գյուլումյան Վահե', 'Դավթյան Կարեն', 'Դիլանյան Աննա', 'Զալյան Արման', 'Թադևոսյան Սյուզան', 'Իգիթյան Սոնա', 'Լևոնյան Արթեմ', 'Կարապետյան Լիլիթ', 'Կիրակոսյան Ռոզա', 'Կիրակոսյան Ալիսա', 'Հակոբջանյան Անի', 'Մամիկոնյան Ռուբեն', 'Նահապետյան Գայանե', 'Սահակյան Կարեն', 'Վանյան Արյուսակ', 'Փայտյան Հրայր', 'Քյարունյան Կարեն', 'Օհաննիսյան Հակոբ']
     };
@@ -726,7 +781,6 @@
                 const val = markRow ? markRow[2] : "";
 
                 if (currentView === 'annual') {
-                    // Տարեկանը հաշվում ենք ԽՍՏՈՐԵՆ միայն 1-ին և 2-րդ կիսամյակների հիման վրա
                     const m1Row = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === "1");
                     const m2Row = allData.find(r => r[0] === student && r[1] === sub && String(r[3]) === "2");
                     const m1 = m1Row ? parseFloat(m1Row[2]) : 0;
