@@ -51,7 +51,7 @@
 
         .annual-col { background-color: #fcfcfc; border-left: 2px solid #eee; }
 
-        /* Քննական քարտեր՝ ԼԻՈՎԻՆ ԻՐԱՐ ՏԱԿ */
+        /* Քննական քարտեր */
         #examsSection { display: none; } 
         .exams-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: flex-start; margin-top: 10px; }
         
@@ -118,13 +118,12 @@
         <div class="exams-grid" id="examsBody"></div>
     </div>
 
-    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱմԱԿԱՐԳԻՑ</a>
+    <a href="index.html" class="logout-btn">ԴՈՒՐՍ ԳԱԼ ՀԱՄԱԿԱՐԳԻՑ</a>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXhLT76CLsNbXGkcWMrvVx3_AmsMoL0-hun0rKSDHmMPnJedhM0uShmSWcO7gEL15Y/exec";
     
-    // Ավելացվեց "Մաթեմատիկա"-ն, որպեսզի քննության տողը գտնի
     const subjects = ["Հանրահաշիվ", "Երկրաչափություն", "Մաթեմատիկա", "Մասնագիտացված մաթեմատիկա", "Ֆիզիկա", "Հայոց Լեզու", "Հայ Գրականություն", "Հայոց Պատմություն", "Օտար Լեզու", "Ռուսաց Լեզու", "Ինֆորմատիկա", "Հասարակագիտություն"];
 
     const currentStudent = localStorage.getItem('studentName') || "Աշակերտ";
@@ -177,23 +176,33 @@
             document.getElementById('loading-overlay').style.display = 'none';
 
             const studentRow = rows.find(r => r[0] === currentStudent);
+            let studentClass = "";
             if (studentRow && studentRow[4]) {
-                document.getElementById('stClass').innerText = "Դասարան՝ " + studentRow[4];
+                studentClass = String(studentRow[4]).trim();
+                document.getElementById('stClass').innerText = "Դասարան՝ " + studentClass;
             } else {
                 document.getElementById('stClass').innerText = "Դասարան՝ -";
             }
 
             let hasExams = false;
+            let isGrade12 = studentClass.includes("12");
 
             subjects.forEach(sub => {
                 const sem1Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "1");
                 const sem2Row = rows.find(r => r[0] === currentStudent && r[1] === sub && String(r[3]) === "2");
                 
-                const examRow = rows.find(r => {
-                    if (r[0] !== currentStudent || r[1] !== sub) return false;
-                    const type = String(r[3]).toLowerCase().trim();
-                    return type === "exams" || type.includes("քնն") || type.includes("math") || type.includes("մաթ");
-                });
+                // 12-րդ դասարանի դեպքում «Հայոց Լեզու» և «Հայ Գրականություն» առարկաների քննությունը բաց ենք թողնում այստեղ,
+                // քանի որ այն ներքևում կարդալու ենք «Հայոց Լեզու և Գրականություն» անվամբ
+                let shouldSkipExamSearch = isGrade12 && (sub === "Հայոց Լեզու" || sub === "Հայ Գրականություն");
+
+                let examRow = null;
+                if (!shouldSkipExamSearch) {
+                    examRow = rows.find(r => {
+                        if (r[0] !== currentStudent || r[1] !== sub) return false;
+                        const type = String(r[3]).toLowerCase().trim();
+                        return type === "exams" || type.includes("քնն") || type.includes("math") || type.includes("մաթ");
+                    });
+                }
 
                 const m1 = sem1Row ? sem1Row[2] : "-";
                 const m2 = sem2Row ? sem2Row[2] : "-";
@@ -203,7 +212,7 @@
                     annual = Math.round((parseInt(m1) + parseInt(m2)) / 2);
                 }
 
-                // ԹԱՔՑՆԵԼ "Մաթեմատիկա" տողը ընթացիկ աղյուսակից, որպեսզի դատարկ չերևա
+                // ԹԱՔՑՆԵԼ "Մաթեմատիկա" տողը ընթացիկ աղյուսակից
                 if (sub !== "Մաթեմատիկա") {
                     tbody.innerHTML += `
                         <tr>
@@ -225,6 +234,25 @@
                     `;
                 }
             });
+
+            // ՍՊԵՑԻՖԻԿ ՍՏՈՒԳՈՒՄ 12-ՐԴ ԴԱՍԱՐԱՆԻ ՀԱՄԱՐ (Հայոց լեզու և գրականություն համատեղ քննություն)
+            if (isGrade12) {
+                const combinedExamRow = rows.find(r => {
+                    return r[0] === currentStudent && 
+                           r[1] === "Հայոց Լեզու և Գրականություն" && 
+                           String(r[3]).toLowerCase().trim() === "exams";
+                });
+
+                if (combinedExamRow && combinedExamRow[2] !== "" && combinedExamRow[2] !== "-") {
+                    hasExams = true;
+                    examsBody.innerHTML += `
+                        <div class="exam-card">
+                            <span class="exam-subject">Հայոց Լեզու և Գրականություն</span>
+                            ${getExamStatusHTML(combinedExamRow[2])}
+                        </div>
+                    `;
+                }
+            }
 
             if (hasExams) {
                 document.getElementById('examsSection').style.display = 'block';
