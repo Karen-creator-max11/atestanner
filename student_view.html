@@ -200,7 +200,8 @@
                     examRow = rows.find(r => {
                         if (r[0] !== currentStudent || r[1] !== sub) return false;
                         const type = String(r[3]).toLowerCase().trim();
-                        return type === "exams" || type.includes("քնն") || type.includes("math") || type.includes("մաթ");
+                        // Ուղղված է՝ ստուգում է հստակ բառերը, որպեսզի "թեմատիկ"-ի կամ "ամփոփիչ"-ի միջի "մաթ"-ը սխալմամբ չհամարի քննություն
+                        return type === "exams" || type === "քննություն" || type === "քնն" || type === "math" || type === "մաթեմատիկա";
                     });
                 }
 
